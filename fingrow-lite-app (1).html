@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FinGrow Lite — Catat, Kelola, Tumbuh</title>
+<meta name="description" content="Aplikasi pencatatan keuangan untuk UMKM. Catat pemasukan dan pengeluaran, pantau laba, naikkan SkorTumbuh, dan ajukan Modal Stok.">
+<meta name="theme-color" content="#1F2F98">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#3B82F6;--blue-d:#2563EB;--blue-l:#E0F2FE;--blue-l2:#BAE6FD;
+  --orange:#F97316;--orange-l:#FB923C;--purple:#DDD6FE;--purple-d:#7C3AED;
+  --a1:#7BD5F5;--a2:#787FF6;--a3:#4ADEDE;--a4:#1CA7EC;--a5:#1F2F98;
+  --green:#10B981;--green-l:#D1FAE5;--red:#EF4444;--red-l:#FEE2E2;
+  --bg:#F5F8FC;--surface:#FFFFFF;--surface-2:#F8FAFC;--ink:#0F172A;--ink-2:#334155;--muted:#64748B;--line:#E2E8F0;
+  --shadow:0 16px 40px rgba(15,23,42,.10);--shadow-s:0 2px 10px rgba(15,23,42,.05);
+  --r:18px;--sidebar:250px;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root[data-theme="dark"]{
+  --bg:#0B1220;--surface:#111C2E;--surface-2:#0F1A2A;--ink:#F1F5F9;--ink-2:#CBD5E1;--muted:#94A3B8;--line:#1E2D45;
+  --blue-l:#13294A;--blue-l2:#1B3A63;--green-l:#0C3A2C;--red-l:#3E1C1C;--purple:#241C4D;
+  --shadow:0 16px 40px rgba(0,0,0,.4);--shadow-s:0 2px 10px rgba(0,0,0,.28);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:15px;-webkit-tap-highlight-color:transparent;transition:background .3s,color .3s}
+h1,h2,h3,h4,.fd{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.4px;margin:0}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+
+/* ============ SHELL ============ */
+.app{display:flex;min-height:100dvh}
+.side{width:var(--sidebar);flex:0 0 var(--sidebar);background:var(--surface);border-right:1px solid var(--line);padding:18px 14px;position:fixed;top:0;bottom:0;left:0;display:flex;flex-direction:column;gap:6px;z-index:60;transition:transform .3s}
+.brand{display:flex;align-items:center;gap:10px;padding:8px 10px 18px;font-weight:800;font-family:'Plus Jakarta Sans';font-size:17px}
+.brand .lg{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--a4),var(--a2));display:grid;place-items:center;font-size:19px;box-shadow:0 8px 18px rgba(28,167,236,.35)}
+.navi{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:13px;font-weight:600;font-size:14.5px;color:var(--ink-2);cursor:pointer;border:0;background:none;width:100%;text-align:left;transition:.18s}
+.navi:hover{background:var(--surface-2);color:var(--ink)}
+.navi.on{background:linear-gradient(120deg,var(--a5),var(--a2));color:#fff;box-shadow:0 10px 22px rgba(31,47,152,.28)}
+.navi svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:0 0 19px}
+.navi .badge{margin-left:auto;background:var(--orange);color:#fff;border-radius:99px;font-size:10.5px;padding:2px 7px;font-weight:800}
+.side .spacer{flex:1}
+.usercard{border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:center;cursor:pointer;transition:.2s}
+.usercard:hover{background:var(--surface-2)}
+.ava{width:38px;height:38px;border-radius:12px;background:var(--blue-l);display:grid;place-items:center;font-size:19px;flex:0 0 38px}
+
+.main{flex:1;margin-left:var(--sidebar);min-width:0;display:flex;flex-direction:column}
+.top{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:13px 24px;padding-top:calc(13px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:12px}
+.top h2{font-size:19px}
+.top .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+.icobtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:17px;cursor:pointer;transition:.18s;flex:0 0 40px}
+.icobtn:hover{border-color:var(--blue-l2);transform:translateY(-1px)}
+.icobtn:active{transform:scale(.94)}
+.content{padding:22px 24px 40px;max-width:1180px;width:100%}
+.hide-desktop{display:none}
+@media(max-width:940px){
+  .side{transform:translateX(-100%);box-shadow:var(--shadow)}
+  .side.open{transform:none}
+  .main{margin-left:0}
+  .content{padding:16px 16px 100px}
+  .top{padding:11px 16px;padding-top:calc(11px + env(safe-area-inset-top,0px))}
+  .hide-desktop{display:grid}
+  .hide-mobile{display:none!important}
+}
+.scrim{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:55;display:none}
+.scrim.on{display:block}
+
+/* bottom nav mobile */
+.bnav{position:fixed;bottom:0;left:0;right:0;height:70px;background:var(--surface);border-top:1px solid var(--line);display:none;z-index:58;padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(max-width:940px){.bnav{display:flex}}
+.bnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:10.5px;font-weight:700;font-family:'Plus Jakarta Sans';cursor:pointer;padding-top:6px}
+.bnav button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.bnav button.on{color:var(--blue)}
+.fab{position:fixed;right:18px;bottom:88px;width:56px;height:56px;border-radius:19px;border:0;background:linear-gradient(135deg,var(--a4),var(--a2));color:#fff;font-size:26px;box-shadow:0 14px 30px rgba(31,47,152,.4);cursor:pointer;z-index:59;display:none}
+@media(max-width:940px){.fab{display:grid;place-items:center}}
+.fab:active{transform:scale(.92)}
+
+/* ============ PRIMITIVES ============ */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow-s)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.g21{grid-template-columns:1.6fr 1fr}
+@media(max-width:1020px){.g4{grid-template-columns:1fr 1fr}.g21{grid-template-columns:1fr}}
+@media(max-width:680px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.row{display:flex;align-items:center;gap:10px}
+.sp{justify-content:space-between}
+.wrap2{flex-wrap:wrap}
+.muted{color:var(--muted)}
+.tiny{font-size:12px}.sm{font-size:13px}.b{font-weight:700}
+.mt{margin-top:14px}.mt-s{margin-top:8px}.mt-l{margin-top:22px}
+.sec{font-family:'Plus Jakarta Sans';font-weight:800;font-size:16px;margin:26px 0 12px}
+.btn{border:0;border-radius:13px;padding:12px 18px;font-family:'Plus Jakarta Sans';font-weight:700;font-size:14.5px;background:var(--blue);color:#fff;cursor:pointer;transition:.18s;box-shadow:0 8px 18px rgba(59,130,246,.28)}
+.btn:hover{background:var(--blue-d);transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn.block{width:100%}
+.btn.orange{background:var(--orange);box-shadow:0 8px 18px rgba(249,115,22,.3)}
+.btn.orange:hover{background:#EA6A0C}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+.btn.ghost:hover{background:var(--surface-2);border-color:var(--blue-l2)}
+.btn.soft{background:var(--blue-l);color:var(--blue-d);box-shadow:none}
+.btn.danger{background:var(--red);box-shadow:none}
+.btn.sm{padding:9px 13px;font-size:13px;border-radius:11px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:99px;font-size:11.5px;font-weight:700;font-family:'Plus Jakarta Sans'}
+.pill.blue{background:var(--blue-l);color:var(--blue-d)}
+.pill.green{background:var(--green-l);color:var(--green)}
+.pill.orange{background:#FFEDD5;color:#C2410C}
+.pill.purple{background:var(--purple);color:var(--purple-d)}
+.pill.grey{background:var(--surface-2);color:var(--muted)}
+.pill.red{background:var(--red-l);color:var(--red)}
+:root[data-theme="dark"] .pill.orange{background:#3A2410;color:#FDBA74}
+.bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--a4),var(--a2));transition:width .8s cubic-bezier(.4,0,.2,1)}
+.bar.orange>i{background:linear-gradient(90deg,var(--orange-l),var(--orange))}
+.bar.green>i{background:linear-gradient(90deg,#34D399,var(--green))}
+label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-2);margin:14px 0 6px;font-family:'Plus Jakarta Sans'}
+input,select,textarea{width:100%;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 13px;outline:none;transition:.18s}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-l)}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:13px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:none;padding:10px;border-radius:10px;font-family:'Plus Jakarta Sans';font-weight:700;font-size:13.5px;color:var(--muted);cursor:pointer;transition:.18s}
+.seg button.on{background:var(--surface);color:var(--blue-d);box-shadow:var(--shadow-s)}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chips button{border:1.4px solid var(--line);background:var(--surface);border-radius:10px;padding:7px 12px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink-2);transition:.16s}
+.chips button.on{background:var(--blue-l);border-color:var(--blue);color:var(--blue-d)}
+.empty{text-align:center;padding:34px 16px;color:var(--muted)}
+.empty .e{font-size:40px;margin-bottom:8px}
+
+/* ============ SPECIFIC ============ */
+.page{display:none;animation:fade .32s ease}
+.page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.balance{background:linear-gradient(135deg,var(--a5),var(--a2) 55%,var(--a4));border-radius:24px;padding:26px;color:#fff;position:relative;overflow:hidden}
+.balance .blob{position:absolute;width:230px;height:230px;border-radius:50%;background:rgba(74,222,222,.35);filter:blur(42px);top:-70px;right:-40px}
+.balance>*{position:relative;z-index:2}
+.balance .v{font-family:'Plus Jakarta Sans';font-weight:800;font-size:clamp(28px,4.6vw,40px);margin:6px 0 2px}
+.kpi{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.kpi .k{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:15px;padding:11px 14px;flex:1;min-width:130px}
+.stat .v{font-family:'Plus Jakarta Sans';font-weight:800;font-size:23px}
+.ic{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-size:18px;flex:0 0 40px}
+.txr{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;transition:.16s}
+.txr:hover{background:var(--surface-2)}
+.txr .amt{margin-left:auto;font-weight:800;font-family:'Plus Jakarta Sans';white-space:nowrap}
+.in{color:var(--green)}.out{color:var(--red)}
+.daygrp{font-size:12px;font-weight:700;color:var(--muted);padding:14px 12px 6px;text-transform:uppercase;letter-spacing:.4px}
+.chart{display:flex;align-items:flex-end;gap:10px;height:170px;padding-top:10px}
+.chart .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;height:100%;cursor:pointer}
+.chart .stack{display:flex;flex-direction:column;justify-content:flex-end;gap:3px;height:100%}
+.chart .bi{background:linear-gradient(180deg,var(--a3),var(--a4));border-radius:6px 6px 0 0;min-height:3px;transition:height .7s cubic-bezier(.4,0,.2,1),opacity .2s}
+.chart .bo{background:linear-gradient(180deg,#FCA5A5,var(--red));border-radius:6px 6px 0 0;min-height:3px;transition:height .7s cubic-bezier(.4,0,.2,1)}
+.chart .col:hover .bi,.chart .col:hover .bo{opacity:.82}
+.chart .lb{text-align:center;font-size:11px;color:var(--muted);font-weight:600;padding-top:6px}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);font-weight:600}
+.legend i{width:10px;height:10px;border-radius:4px;display:inline-block;margin-right:5px}
+.catrow{display:flex;align-items:center;gap:12px;padding:9px 0}
+.catrow .nm{flex:1;min-width:0}
+.gauge{position:relative;width:190px;height:190px;margin:0 auto}
+.gauge svg{transform:rotate(-90deg)}
+.gauge .v{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.step{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px dashed var(--line)}
+.step:last-child{border-bottom:0}
+.step .n{width:30px;height:30px;border-radius:50%;background:var(--surface-2);color:var(--muted);display:grid;place-items:center;font-weight:800;font-size:13px;font-family:'Plus Jakarta Sans';flex:0 0 30px;border:1px solid var(--line)}
+.step.done .n{background:var(--green);color:#fff;border-color:var(--green)}
+.step.now .n{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-l)}
+.mod{border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;gap:13px;align-items:center;cursor:pointer;transition:.2s;background:var(--surface)}
+.mod:hover{border-color:var(--blue-l2);transform:translateY(-2px);box-shadow:var(--shadow-s)}
+.thumb{width:66px;height:56px;border-radius:13px;display:grid;place-items:center;font-size:24px;flex:0 0 66px;background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff}
+.opt{display:block;width:100%;text-align:left;border:1.6px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;margin-bottom:9px;font-weight:600;cursor:pointer;transition:.18s}
+.opt:hover{border-color:var(--blue-l2)}
+.opt.ok{background:var(--green-l);border-color:var(--green)}
+.opt.no{background:var(--red-l);border-color:var(--red)}
+.rw{display:flex;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}
+.rw.own{border-color:var(--green)}
+.note{background:var(--blue-l);border-radius:13px;padding:12px 14px;font-size:13px;color:var(--ink-2);line-height:1.65}
+.note.warn{background:#FFF7ED;color:#9A3412}
+:root[data-theme="dark"] .note.warn{background:#33210F;color:#FDBA74}
+.note.ok{background:var(--green-l);color:var(--green)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.kv:last-child{border-bottom:0}
+.slider{-webkit-appearance:none;height:7px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);padding:0}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--blue);border:4px solid var(--surface);box-shadow:0 3px 10px rgba(59,130,246,.45);cursor:pointer}
+.slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--blue);border:4px solid var(--surface);cursor:pointer}
+.sw{width:46px;height:27px;border-radius:99px;background:var(--line);position:relative;cursor:pointer;transition:.25s;flex:0 0 46px}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.25s;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.sw.on{background:var(--blue)}
+.sw.on::after{transform:translateX(19px)}
+
+/* dialog */
+.mask{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:18px}
+.mask.on{display:flex;animation:fade2 .2s}
+@keyframes fade2{from{opacity:0}to{opacity:1}}
+.dlg{background:var(--surface);border:1px solid var(--line);border-radius:24px;width:100%;max-width:440px;padding:24px;max-height:90dvh;overflow-y:auto;animation:pop .3s cubic-bezier(.2,.9,.3,1.06);box-shadow:var(--shadow)}
+@keyframes pop{from{transform:translateY(20px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+@media(max-width:560px){.mask{align-items:flex-end;padding:0}.dlg{border-radius:24px 24px 0 0;max-width:none;animation:up .3s cubic-bezier(.2,.9,.3,1.06)}}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.pop{width:70px;height:70px;border-radius:50%;display:grid;place-items:center;font-size:32px;margin:0 auto 12px}
+.toast{position:fixed;left:50%;transform:translate(-50%,16px);bottom:24px;background:var(--ink);color:var(--bg);padding:13px 18px;border-radius:14px;font-size:13.5px;font-weight:600;z-index:200;opacity:0;transition:.3s;pointer-events:none;box-shadow:var(--shadow);max-width:90vw;text-align:center}
+:root[data-theme="dark"] .toast{background:#F8FAFC;color:#0F172A}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:940px){.toast{bottom:92px}}
+
+/* welcome */
+.welcome{position:fixed;inset:0;z-index:150;background:linear-gradient(160deg,#0F172A,#1F2F98 55%,#1CA7EC);display:none;align-items:center;justify-content:center;padding:22px;overflow-y:auto}
+.welcome.on{display:flex}
+.wbox{background:var(--surface);border-radius:26px;padding:28px;width:100%;max-width:440px;box-shadow:var(--shadow)}
+.wstep{display:none}.wstep.on{display:block;animation:fade .3s}
+.dots{display:flex;gap:6px;justify-content:center;margin:18px 0}
+.dots i{width:7px;height:7px;border-radius:99px;background:var(--line);transition:.3s}
+.dots i.on{width:22px;background:var(--blue)}
+
+/* ===== NIB ===== */
+.way{border:1px solid var(--line);border-radius:18px;padding:18px;background:var(--surface);transition:.22s;display:flex;flex-direction:column}
+.way:hover{border-color:var(--blue-l2);transform:translateY(-3px);box-shadow:var(--shadow-s)}
+.way .num{width:34px;height:34px;border-radius:11px;background:var(--blue-l);color:var(--blue-d);display:grid;place-items:center;font-weight:800;font-family:'Plus Jakarta Sans';font-size:15px}
+.way ul{margin:10px 0 0;padding-left:18px;font-size:13.5px;color:var(--muted);line-height:1.85}
+.way ul b{color:var(--ink-2)}
+.ext{display:inline-flex;align-items:center;gap:7px;justify-content:center}
+.chk{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px dashed var(--line);cursor:pointer}
+.chk:last-child{border-bottom:0}
+.chk .bx{width:24px;height:24px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;color:#fff;font-size:12px;flex:0 0 24px;transition:.2s;margin-top:1px}
+.chk.on .bx{background:var(--green);border-color:var(--green)}
+.chk.on .t{text-decoration:line-through;color:var(--muted)}
+.faq{border:1px solid var(--line);border-radius:14px;margin-bottom:9px;overflow:hidden;background:var(--surface)}
+.faq>button{width:100%;text-align:left;background:none;border:0;padding:14px 16px;font-weight:700;font-family:'Plus Jakarta Sans';font-size:14px;cursor:pointer;display:flex;gap:10px;align-items:center}
+.faq>button i{margin-left:auto;font-style:normal;color:var(--blue);transition:.3s;font-size:18px}
+.faq.open>button i{transform:rotate(45deg)}
+.faq .a{max-height:0;overflow:hidden;transition:max-height .32s ease;color:var(--muted);font-size:13.5px;line-height:1.8}
+.faq.open .a{max-height:260px}
+.faq .a p{margin:0;padding:0 16px 15px}
+
+/* ===== VOICE INPUT ===== */
+.micbox{text-align:center;padding:14px 0 4px}
+.mic{width:122px;height:122px;border-radius:50%;border:0;margin:0 auto;display:grid;place-items:center;font-size:44px;color:#fff;cursor:pointer;
+  background:linear-gradient(140deg,var(--a4),var(--a2));box-shadow:0 16px 36px rgba(31,47,152,.36);transition:transform .16s,box-shadow .25s;position:relative}
+.mic:active{transform:scale(.94)}
+.mic:hover{box-shadow:0 20px 42px rgba(31,47,152,.46)}
+.mic.off{background:linear-gradient(140deg,#94A3B8,#64748B);box-shadow:none}
+.mic.rec{animation:beat 1.15s infinite}
+.mic.rec::before,.mic.rec::after{content:'';position:absolute;inset:0;border-radius:50%;border:2.5px solid rgba(74,222,222,.65);animation:ring 1.8s infinite}
+.mic.rec::after{animation-delay:.6s}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.055)}}
+@keyframes ring{0%{transform:scale(1);opacity:.85}100%{transform:scale(1.7);opacity:0}}
+.wave{display:flex;gap:4px;justify-content:center;align-items:center;height:26px;margin-top:10px;opacity:0;transition:opacity .25s}
+.wave.on{opacity:1}
+.wave i{width:4px;border-radius:9px;background:var(--a4);animation:wv .9s infinite ease-in-out}
+.wave i:nth-child(2){animation-delay:.1s}.wave i:nth-child(3){animation-delay:.2s}.wave i:nth-child(4){animation-delay:.3s}
+.wave i:nth-child(5){animation-delay:.4s}.wave i:nth-child(6){animation-delay:.5s}.wave i:nth-child(7){animation-delay:.6s}
+@keyframes wv{0%,100%{height:7px}50%{height:24px}}
+.micLbl{margin-top:12px;font-size:15px}
+.ex{display:block;width:100%;text-align:left;border:1.4px dashed var(--line);background:transparent;border-radius:11px;padding:10px 12px;margin-top:7px;
+  font-size:13.5px;color:var(--ink-2);cursor:pointer;transition:.18s}
+.ex:hover{border-color:var(--blue);background:var(--blue-l);color:var(--blue-d)}
+.heard{background:var(--surface-2);border:1px dashed var(--line);border-radius:13px;padding:12px 14px;font-size:14.5px;line-height:1.6;margin-top:14px}
+.heard .txt{font-weight:600}
+.heard .int{color:var(--muted);font-weight:400}
+.parsed{border:1.5px solid var(--green);background:var(--green-l);border-radius:14px;padding:12px 14px;margin-top:14px;font-size:13px;line-height:1.7}
+</style>
+</head>
+<body>
+
+<!-- ============ WELCOME / SETUP ============ -->
+<div class="welcome" id="welcome">
+  <div class="wbox">
+    <div class="wstep on" id="w0">
+      <div style="width:76px;height:76px;border-radius:24px;background:linear-gradient(135deg,var(--a4),var(--a2));display:grid;place-items:center;font-size:36px;margin-bottom:18px">🌱</div>
+      <h1 style="font-size:26px">Selamat datang di FinGrow Lite</h1>
+      <p class="muted mt-s" style="line-height:1.75">Catat pemasukan dan pengeluaran usaha Anda dengan cepat, pantau laba sebenarnya, dan kumpulkan rekam jejak yang bisa membuka akses modal.</p>
+      <div class="note mt">🔒 Semua data tersimpan di perangkat Anda sendiri. Tidak dikirim ke mana pun.</div>
+      <button class="btn block mt-l" onclick="wgo(1)">Mulai</button>
+    </div>
+    <div class="wstep" id="w1">
+      <h2 style="font-size:21px">Kenalan dulu</h2>
+      <p class="muted sm mt-s">Isi seperlunya saja. Bisa diubah kapan pun di menu Profil.</p>
+      <label>Nama Anda</label>
+      <input id="wNama" placeholder="Contoh: Sari">
+      <label>Nama usaha</label>
+      <input id="wUsaha" placeholder="Contoh: Warung Bu Sari">
+      <label>Jenis usaha</label>
+      <select id="wKategori">
+        <option>Kuliner</option><option>Kelontong / Sembako</option><option>Pakaian</option>
+        <option>Jasa</option><option>Pertanian</option><option>Lainnya</option>
+      </select>
+      <div class="row mt-l" style="gap:10px">
+        <button class="btn ghost" onclick="wgo(0)">Kembali</button>
+        <button class="btn" style="flex:1" onclick="wgo(2)">Lanjut</button>
+      </div>
+    </div>
+    <div class="wstep" id="w2">
+      <h2 style="font-size:21px">Uang yang ada sekarang</h2>
+      <p class="muted sm mt-s">Berapa uang usaha yang Anda pegang saat ini? Angka ini jadi titik awal saldo Anda.</p>
+      <label>Saldo awal (Rp)</label>
+      <input id="wSaldo" inputmode="numeric" placeholder="0" value="0">
+      <div class="chips mt-s">
+        <button onclick="setSaldo(0)">Mulai dari 0</button>
+        <button onclick="setSaldo(500000)">Rp500rb</button>
+        <button onclick="setSaldo(1000000)">Rp1jt</button>
+        <button onclick="setSaldo(5000000)">Rp5jt</button>
+      </div>
+      <div class="note mt">Tenang, angka ini bisa diperbaiki nanti kalau keliru.</div>
+      <div class="row mt-l" style="gap:10px">
+        <button class="btn ghost" onclick="wgo(1)">Kembali</button>
+        <button class="btn" style="flex:1" onclick="finishSetup()">Mulai Mencatat</button>
+      </div>
+    </div>
+    <div class="dots" id="wDots"><i class="on"></i><i></i><i></i></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" onclick="toggleSide()"></div>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="side" id="side">
+    <div class="brand"><span class="lg">🌱</span> FinGrow <span style="color:var(--a4)">Lite</span></div>
+    <button class="navi on" data-p="home" onclick="show('home')"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Beranda</button>
+    <button class="navi" data-p="tx" onclick="show('tx')"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Transaksi</button>
+    <button class="navi" data-p="report" onclick="show('report')"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 15 3.5-4 3 2.5L20 7"/></svg>Laporan</button>
+    <button class="navi" data-p="learn" onclick="show('learn')"><svg viewBox="0 0 24 24"><path d="m22 9-10-5L2 9l10 5 10-5Z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/></svg>Belajar<span class="badge" id="bdgLearn"></span></button>
+    <button class="navi" data-p="reward" onclick="show('reward')"><svg viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/></svg>Rewards<span class="badge" id="bdgReward"></span></button>
+    <button class="navi" data-p="skor" onclick="show('skor')"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 12 19 5"/></svg>SkorTumbuh</button>
+    <button class="navi" data-p="modal" onclick="show('modal')"><svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/></svg>Modal Stok</button>
+    <button class="navi" data-p="nib" onclick="show('nib')"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg>Izin Usaha (NIB)<span class="badge" id="bdgNib"></span></button>
+    <div class="spacer"></div>
+    <button class="navi" data-p="profil" onclick="show('profil')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.6 3.9-5.6 7.5-5.6s6.7 2 7.5 5.6"/></svg>Profil &amp; Pengaturan</button>
+    <div class="usercard mt-s" onclick="show('profil')">
+      <div class="ava" id="sideAva">🏪</div>
+      <div style="min-width:0">
+        <div class="b sm" id="sideUsaha" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Usaha Saya</div>
+        <div class="tiny muted" id="sideLvl">Usaha Baru</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="top">
+      <button class="icobtn hide-mobile" style="display:none" id="burger" onclick="toggleSide()">☰</button>
+      <div style="flex:1;min-width:0">
+        <h2 id="pgTitle">Beranda</h2>
+        <div class="sub" id="pgSub">Ringkasan usaha Anda hari ini</div>
+      </div>
+      <button class="icobtn" id="themeBtn" onclick="toggleTheme()" title="Ganti tema">🌙</button>
+      <button class="btn hide-mobile" onclick="openTx()">+ Catat Transaksi</button>
+    </header>
+
+    <div class="content">
+
+      <!-- ===== HOME ===== -->
+      <section class="page on" id="p-home">
+        <div class="grid g21">
+          <div class="balance">
+            <div class="blob"></div>
+            <div class="row sp">
+              <span class="tiny" style="opacity:.85;font-weight:600" id="greet">Selamat datang</span>
+              <span class="pill" style="background:rgba(255,255,255,.18);color:#fff">🌱 <span id="hCoin">0</span> koin</span>
+            </div>
+            <div class="tiny" style="opacity:.85;margin-top:14px">Saldo usaha saat ini</div>
+            <div class="v" id="hSaldo">Rp0</div>
+            <div class="tiny" style="opacity:.8" id="hSaldoSub"></div>
+            <div class="kpi">
+              <div class="k"><div class="tiny" style="opacity:.85">Masuk hari ini</div><div class="b" style="font-size:17px" id="hIn">Rp0</div></div>
+              <div class="k"><div class="tiny" style="opacity:.85">Keluar hari ini</div><div class="b" style="font-size:17px" id="hOut">Rp0</div></div>
+              <div class="k"><div class="tiny" style="opacity:.85">Laba hari ini</div><div class="b" style="font-size:17px" id="hProfit">Rp0</div></div>
+            </div>
+          </div>
+          <div class="card" style="display:flex;flex-direction:column;justify-content:space-between">
+            <div>
+              <div class="row sp"><div class="b">SkorTumbuh</div><span class="pill purple" id="hSkorLvl">Level 1</span></div>
+              <div class="row mt" style="gap:14px">
+                <div class="fd" style="font-weight:800;font-size:38px" id="hSkor">500</div>
+                <div class="tiny muted" style="line-height:1.5">dari 900<br>Naik saat Anda rutin mencatat</div>
+              </div>
+              <div class="bar mt"><i id="hSkorBar" style="width:0%"></i></div>
+              <div class="tiny muted mt-s" id="hSkorHint"></div>
+            </div>
+            <button class="btn ghost block mt" onclick="show('skor')">Lihat rincian skor</button>
+          </div>
+        </div>
+
+        <div class="grid g4 mt">
+          <div class="card" style="cursor:pointer" onclick="openTx('in')"><div class="ic" style="background:var(--blue-l)">🎙️</div><div class="b mt-s">Catat dengan Suara</div><div class="tiny muted">Ucapkan, langsung tercatat</div></div>
+          <div class="card" style="cursor:pointer" onclick="openTx('out')"><div class="ic" style="background:var(--red-l)">🛒</div><div class="b mt-s">Catat Pengeluaran</div><div class="tiny muted">Belanja dan biaya</div></div>
+          <div class="card" style="cursor:pointer" onclick="show('report')"><div class="ic" style="background:var(--blue-l)">📊</div><div class="b mt-s">Lihat Laporan</div><div class="tiny muted">Laba &amp; pengeluaran</div></div>
+          <div class="card" style="cursor:pointer" onclick="show('modal')"><div class="ic" style="background:#FFEDD5">📦</div><div class="b mt-s">Modal Stok</div><div class="tiny muted" id="hModalSub">Cek kelayakan</div></div>
+        </div>
+
+        <div class="grid g21 mt">
+          <div class="card">
+            <div class="row sp wrap2">
+              <div><div class="b">Arus uang 7 hari terakhir</div><div class="tiny muted" id="weekSum"></div></div>
+              <div class="legend"><span><i style="background:var(--a4)"></i>Masuk</span><span><i style="background:var(--red)"></i>Keluar</span></div>
+            </div>
+            <div class="chart mt" id="chart7"></div>
+          </div>
+          <div class="card">
+            <div class="b">Target mencatat</div>
+            <div class="tiny muted">Konsistensi harian menjaga skor Anda</div>
+            <div class="row sp mt"><span class="sm b" id="dailyLbl">0 dari 3 transaksi</span><span class="pill blue" id="streakPill">🔥 0 hari</span></div>
+            <div class="bar mt-s"><i id="dailyBar" style="width:0%"></i></div>
+            <div class="tiny muted mt-s" id="dailyHint"></div>
+            <div class="sec" style="margin:18px 0 8px;font-size:14px">Misi hari ini</div>
+            <div id="homeMisi"></div>
+          </div>
+        </div>
+
+        <div class="card mt" id="loanBox" style="display:none"></div>
+
+        <div class="row sp sec"><span>Transaksi terbaru</span><button class="btn ghost sm" onclick="show('tx')">Lihat semua</button></div>
+        <div class="card" id="homeTx" style="padding:8px"></div>
+
+        <div class="sec">Lanjutkan belajar</div>
+        <div id="homeLearn"></div>
+      </section>
+
+      <!-- ===== TRANSAKSI ===== -->
+      <section class="page" id="p-tx">
+        <div class="grid g3">
+          <div class="card stat"><div class="tiny muted b">TOTAL MASUK</div><div class="v in" id="tIn">Rp0</div><div class="tiny muted" id="tInSub"></div></div>
+          <div class="card stat"><div class="tiny muted b">TOTAL KELUAR</div><div class="v out" id="tOut">Rp0</div><div class="tiny muted" id="tOutSub"></div></div>
+          <div class="card stat"><div class="tiny muted b">SELISIH</div><div class="v" id="tNet">Rp0</div><div class="tiny muted" id="tNetSub"></div></div>
+        </div>
+        <div class="card mt">
+          <div class="row wrap2" style="gap:10px">
+            <input id="q" placeholder="🔎 Cari transaksi…" oninput="renderTx()" style="flex:1;min-width:180px">
+            <select id="fType" onchange="renderTx()" style="width:auto"><option value="all">Semua jenis</option><option value="in">Pemasukan</option><option value="out">Pengeluaran</option></select>
+            <select id="fRange" onchange="renderTx()" style="width:auto"><option value="30">30 hari terakhir</option><option value="7">7 hari terakhir</option><option value="all">Semua waktu</option></select>
+            <button class="btn ghost sm" onclick="exportCSV()">⬇ Unduh CSV</button>
+            <button class="btn sm" onclick="openTx()">+ Catat</button>
+          </div>
+        </div>
+        <div class="card mt" style="padding:8px" id="txList"></div>
+      </section>
+
+      <!-- ===== LAPORAN ===== -->
+      <section class="page" id="p-report">
+        <div class="card">
+          <div class="row sp wrap2" style="gap:10px">
+            <div><div class="b">Periode laporan</div><div class="tiny muted">Pilih bulan yang ingin dilihat</div></div>
+            <select id="repMonth" onchange="renderReport()" style="width:auto"></select>
+          </div>
+        </div>
+        <div class="grid g4 mt">
+          <div class="card stat"><div class="tiny muted b">PEMASUKAN</div><div class="v in" id="rIn">Rp0</div></div>
+          <div class="card stat"><div class="tiny muted b">PENGELUARAN</div><div class="v out" id="rOut">Rp0</div></div>
+          <div class="card stat"><div class="tiny muted b">LABA BERSIH</div><div class="v" id="rProfit">Rp0</div></div>
+          <div class="card stat"><div class="tiny muted b">MARGIN</div><div class="v" id="rMargin">0%</div></div>
+        </div>
+        <div class="card mt" id="insightBox"></div>
+        <div class="grid g2 mt">
+          <div class="card">
+            <div class="b">Arus uang per minggu</div>
+            <div class="legend mt-s"><span><i style="background:var(--a4)"></i>Masuk</span><span><i style="background:var(--red)"></i>Keluar</span></div>
+            <div class="chart mt" id="chartWeek"></div>
+          </div>
+          <div class="card">
+            <div class="b">Pengeluaran per kategori</div>
+            <div class="tiny muted">Ke mana uang usaha Anda pergi</div>
+            <div class="mt" id="catBreak"></div>
+          </div>
+        </div>
+        <div class="card mt">
+          <div class="b">Pemasukan per kategori</div>
+          <div class="mt" id="catIn"></div>
+        </div>
+      </section>
+
+      <!-- ===== BELAJAR ===== -->
+      <section class="page" id="p-learn">
+        <div class="card" style="background:linear-gradient(135deg,var(--a5),var(--a2));color:#fff;border:0">
+          <div class="row sp wrap2">
+            <div>
+              <h3 style="font-size:20px">TUMBUH Academy</h3>
+              <p class="sm" style="opacity:.88;margin-top:6px;max-width:520px;line-height:1.7">Belajar singkat lalu langsung dipraktikkan pada usaha Anda. Setiap modul selesai menambah Koin Tumbuh dan SkorTumbuh.</p>
+            </div>
+            <span class="pill" style="background:rgba(255,255,255,.18);color:#fff">🌱 <span id="lCoin">0</span></span>
+          </div>
+          <div class="bar mt" style="background:rgba(255,255,255,.2);border:0"><i id="lBar" style="width:0%;background:#fff"></i></div>
+          <div class="tiny mt-s" style="opacity:.9"><span id="lDone">0</span> dari <span id="lTotal">4</span> modul selesai</div>
+        </div>
+        <div class="sec">Video pendek</div>
+        <div class="grid g2" id="modVideo"></div>
+        <div class="sec">Kelas praktis</div>
+        <div class="grid g2" id="modLive"></div>
+      </section>
+
+      <!-- ===== REWARDS ===== -->
+      <section class="page" id="p-reward">
+        <div class="grid g21">
+          <div class="card" style="background:linear-gradient(135deg,#C2410C,var(--orange));color:#fff;border:0">
+            <div class="row sp"><span class="tiny b" style="opacity:.9">KOIN TUMBUH</span><span class="pill" style="background:rgba(255,255,255,.2);color:#fff" id="rwLvl">Usaha Baru</span></div>
+            <div class="fd" style="font-weight:800;font-size:38px;margin-top:8px">🌱 <span id="rwCoin">0</span></div>
+            <div class="bar mt" style="background:rgba(255,255,255,.22);border:0"><i id="rwBar" style="width:0%;background:#fff"></i></div>
+            <div class="tiny mt-s" style="opacity:.92" id="rwHint"></div>
+          </div>
+          <div class="card">
+            <div class="b">Misi harian</div>
+            <div class="tiny muted">Diperbarui setiap hari</div>
+            <div class="mt" id="misiList"></div>
+          </div>
+        </div>
+        <div class="sec">Tukar koin Anda</div>
+        <div class="grid g2" id="rwList"></div>
+        <div class="card mt"><div class="b sm">Riwayat koin</div><div class="mt-s" id="coinLog"></div></div>
+      </section>
+
+      <!-- ===== SKOR ===== -->
+      <section class="page" id="p-skor">
+        <div class="grid g21">
+          <div class="card" style="text-align:center">
+            <div class="gauge">
+              <svg width="190" height="190">
+                <circle cx="95" cy="95" r="78" stroke="var(--line)" stroke-width="15" fill="none"></circle>
+                <circle id="arc" cx="95" cy="95" r="78" stroke="url(#gg)" stroke-width="15" fill="none" stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="490" style="transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1)"></circle>
+                <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4ADEDE"/><stop offset="1" stop-color="#787FF6"/></linearGradient></defs>
+              </svg>
+              <div class="v"><div><div class="fd" style="font-weight:800;font-size:38px" id="sVal">500</div><div class="tiny muted b">dari 900</div></div></div>
+            </div>
+            <span class="pill purple" id="sLvl">Level 1</span>
+            <p class="muted sm mt" style="line-height:1.7;max-width:420px;margin-left:auto;margin-right:auto">Skor dihitung dari kebiasaan mencatat Anda, bukan dari jaminan. Skor ini yang menentukan limit Modal Stok.</p>
+          </div>
+          <div class="card">
+            <div class="b">Faktor penilaian</div>
+            <div class="mt" id="sFaktor"></div>
+          </div>
+        </div>
+        <div class="sec">Cara menaikkan skor</div>
+        <div class="grid g3">
+          <div class="card" style="cursor:pointer" onclick="openTx()"><div class="ic" style="background:var(--blue-l)">✏️</div><div class="b mt-s">Catat setiap hari</div><div class="tiny muted mt-s">Konsistensi harian adalah faktor dengan bobot terbesar.</div></div>
+          <div class="card" style="cursor:pointer" onclick="show('learn')"><div class="ic" style="background:var(--purple)">🎓</div><div class="b mt-s">Selesaikan modul</div><div class="tiny muted mt-s">Setiap modul Academy menambah 15 poin skor.</div></div>
+          <div class="card" style="cursor:pointer" onclick="show('profil')"><div class="ic" style="background:var(--green-l)">🪪</div><div class="b mt-s">Lengkapi verifikasi</div><div class="tiny muted mt-s">Setiap tahap verifikasi menambah 40 poin skor.</div></div>
+        </div>
+      </section>
+
+      <!-- ===== MODAL STOK ===== -->
+      <section class="page" id="p-modal">
+        <div class="grid g21">
+          <div class="card" style="background:linear-gradient(135deg,#C2410C,var(--orange));color:#fff;border:0">
+            <div class="row sp"><span class="tiny b" style="opacity:.9">LIMIT ANDA</span><span class="pill" style="background:rgba(255,255,255,.2);color:#fff" id="mStatus">Terkunci</span></div>
+            <div class="fd" style="font-weight:800;font-size:34px;margin-top:8px" id="mLimit">Rp0</div>
+            <p class="tiny" style="opacity:.92;line-height:1.7;margin-top:8px">Dana dibayarkan langsung kepada distributor dalam bentuk stok barang, bukan uang tunai. Tenor 30 hari, biaya layanan 1,8% per bulan.</p>
+   <div class="tiny mt-s" id="mNib" style="opacity:.95"></div>
+          </div>
+          <div class="card"><div class="b">Syarat kelayakan</div><div class="mt" id="mSyarat"></div></div>
+        </div>
+        <div id="mArea" class="mt"></div>
+        <div class="card mt">
+          <div class="b sm">Kenapa bentuknya barang, bukan uang tunai?</div>
+          <p class="muted sm mt-s" style="line-height:1.75">Pembiayaan yang terikat pada stok membuat modal benar-benar terpakai untuk usaha, risiko penyalahgunaan menurun, dan sumber pembayarannya jelas: hasil penjualan stok yang dibiayai. Skema ini juga menjaga biaya tetap rendah dibanding pinjaman tunai.</p>
+        </div>
+      </section>
+
+
+      <!-- ===== NIB ===== -->
+      <section class="page" id="p-nib">
+        <div id="nibStatus"></div>
+
+        <div class="card mt">
+          <div class="row wrap2" style="gap:14px;align-items:flex-start">
+            <div class="ic" style="background:var(--blue-l)">🪪</div>
+            <div style="flex:1;min-width:220px">
+              <div class="b">Apa itu NIB dan kenapa penting?</div>
+              <p class="muted sm mt-s" style="line-height:1.8;margin:0">Nomor Induk Berusaha (NIB) adalah identitas resmi pelaku usaha yang diterbitkan pemerintah melalui sistem Online Single Submission (OSS), dikelola Kementerian Investasi/BKPM. NIB berlaku sebagai tanda daftar usaha sekaligus pengenal Anda dalam sistem perizinan nasional.</p>
+            </div>
+          </div>
+          <div class="grid g4 mt">
+            <div style="padding:12px;border-radius:14px;background:var(--surface-2)"><div class="b sm">💸 Akses pembiayaan</div><div class="tiny muted mt-s">Syarat umum KUR dan pembiayaan formal lain.</div></div>
+            <div style="padding:12px;border-radius:14px;background:var(--surface-2)"><div class="b sm">🛒 Masuk pasar lebih luas</div><div class="tiny muted mt-s">Dibutuhkan untuk mendaftar sebagai pemasok dan sebagian marketplace.</div></div>
+            <div style="padding:12px;border-radius:14px;background:var(--surface-2)"><div class="b sm">🎓 Ikut program pemerintah</div><div class="tiny muted mt-s">Pelatihan, bantuan, dan pendampingan UMKM.</div></div>
+            <div style="padding:12px;border-radius:14px;background:var(--surface-2)"><div class="b sm">🛡️ Usaha diakui resmi</div><div class="tiny muted mt-s">Legalitas usaha jelas di mata mitra dan pembeli.</div></div>
+          </div>
+          <div class="note mt">Mengurus NIB <b>tidak dipungut biaya</b>. Waspadai pihak yang menawarkan jasa dengan tarif tinggi mengatasnamakan pemerintah.</div>
+        </div>
+
+        <div class="sec">Empat cara resmi mengurus NIB</div>
+        <div class="grid g2">
+          <div class="way">
+            <div class="row sp"><div class="num">1</div><span class="pill blue">Jalur utama</span></div>
+            <h3 class="mt-s" style="font-size:17px">Online lewat Portal OSS</h3>
+            <p class="muted sm mt-s" style="margin:0;line-height:1.75">Tempat utama dan resmi untuk membuat NIB adalah situs oss.go.id yang dikelola langsung oleh Kementerian Investasi/BKPM.</p>
+            <ul>
+              <li><b>Keunggulan:</b> dapat diakses 24 jam dari mana saja, di rumah, kios, atau warung kopi.</li>
+              <li><b>Persyaratan:</b> laptop atau ponsel, koneksi internet, NIK KTP untuk perorangan, atau akta pendirian untuk badan usaha.</li>
+              <li><b>Waktu:</b> bila data lengkap dan lokasi sesuai zonasi, NIB dapat terbit dalam hitungan menit.</li>
+            </ul>
+            <div class="row mt" style="gap:9px;flex-wrap:wrap">
+              <a class="btn ext" href="https://oss.go.id/" target="_blank" rel="noopener">Buka oss.go.id ↗</a>
+              <a class="btn ghost sm ext" href="https://oss.go.id/informasi/kbli-berbasis-risiko" target="_blank" rel="noopener">Cek KBLI usaha ↗</a>
+            </div>
+          </div>
+
+          <div class="way">
+            <div class="row sp"><div class="num">2</div><span class="pill orange">Paling ringkas</span></div>
+            <h3 class="mt-s" style="font-size:17px">Aplikasi ponsel OSS Indonesia</h3>
+            <p class="muted sm mt-s" style="margin:0;line-height:1.75">Pelaku Usaha Mikro dan Kecil perseorangan dapat mengurus NIB lewat aplikasi OSS Indonesia di Google Play Store maupun App Store.</p>
+            <ul>
+              <li><b>Cocok untuk:</b> pedagang kaki lima, toko kelontong, pekerja lepas, dan industri rumah tangga.</li>
+              <li><b>Keunggulan:</b> seluruh proses cukup dari ponsel, tanpa perlu komputer.</li>
+              <li><b>Catatan:</b> pastikan pengembang aplikasi adalah Kementerian Investasi/BKPM sebelum memasang.</li>
+            </ul>
+            <div class="row mt" style="gap:9px;flex-wrap:wrap">
+              <a class="btn ghost ext" href="https://play.google.com/store/search?q=OSS%20Indonesia&c=apps" target="_blank" rel="noopener">Play Store ↗</a>
+              <a class="btn ghost ext" href="https://www.apple.com/id/search/OSS-Indonesia" target="_blank" rel="noopener">App Store ↗</a>
+            </div>
+          </div>
+
+          <div class="way">
+            <div class="row sp"><div class="num">3</div><span class="pill purple">Ada pendamping</span></div>
+            <h3 class="mt-s" style="font-size:17px">Pendampingan di DPMPTSP setempat</h3>
+            <p class="muted sm mt-s" style="margin:0;line-height:1.75">Bila Anda terkendala teknis atau bingung menentukan kategori usaha (KBLI), datangi kantor Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu di kota atau kabupaten Anda.</p>
+            <ul>
+              <li><b>Fungsi:</b> petugas memberi asistensi langsung dalam penginputan data.</li>
+              <li><b>Fasilitas:</b> tersedia self-service booth bagi yang ingin dipandu.</li>
+              <li><b>Bawa:</b> KTP asli, ponsel dengan email aktif, dan catatan alamat usaha.</li>
+            </ul>
+            <a class="btn ghost ext mt" href="https://www.google.com/maps/search/DPMPTSP+terdekat" target="_blank" rel="noopener">Cari DPMPTSP terdekat ↗</a>
+          </div>
+
+          <div class="way">
+            <div class="row sp"><div class="num">4</div><span class="pill green">Satu tempat</span></div>
+            <h3 class="mt-s" style="font-size:17px">Mal Pelayanan Publik (MPP)</h3>
+            <p class="muted sm mt-s" style="margin:0;line-height:1.75">Di banyak kota besar, seperti Bekasi, Tangerang Selatan, dan Bandung, pemerintah menyediakan Mal Pelayanan Publik.</p>
+            <ul>
+              <li><b>Keunggulan:</b> berbagai instansi berkumpul di satu lokasi, termasuk layanan penerbitan NIB.</li>
+              <li><b>Cocok untuk:</b> Anda yang ingin sekalian mengurus izin lain dalam satu kunjungan.</li>
+              <li><b>Tips:</b> datang pagi hari dan cek jam layanan di laman pemerintah daerah.</li>
+            </ul>
+            <a class="btn ghost ext mt" href="https://www.google.com/maps/search/Mal+Pelayanan+Publik+terdekat" target="_blank" rel="noopener">Cari MPP terdekat ↗</a>
+          </div>
+        </div>
+
+        <div class="grid g21 mt">
+          <div class="card">
+            <div class="row sp"><div><div class="b">Siapkan dulu sebelum mendaftar</div><div class="tiny muted">Centang yang sudah siap, tersimpan otomatis</div></div>
+              <span class="pill blue" id="chkCount">0/7</span></div>
+            <div class="mt" id="chkList"></div>
+          </div>
+          <div class="card">
+            <div class="b">Langkah di portal OSS</div>
+            <div class="tiny muted">Alur umum pendaftaran perseorangan</div>
+            <div class="mt" id="ossSteps"></div>
+          </div>
+        </div>
+
+        <div class="sec">Sudah punya NIB?</div>
+        <div class="card">
+          <p class="muted sm" style="margin:0;line-height:1.8">Simpan nomor NIB Anda di sini agar mudah dicari saat dibutuhkan mitra, distributor, atau saat mengajukan pembiayaan. Nomor ini hanya tersimpan di perangkat Anda sendiri.</p>
+          <div class="row wrap2 mt" style="gap:10px;align-items:flex-end">
+            <div style="flex:1;min-width:210px"><label style="margin-top:0">Nomor NIB (13 digit)</label><input id="nibInput" inputmode="numeric" placeholder="Contoh: 1234567890123"></div>
+            <div style="min-width:160px"><label style="margin-top:0">Tanggal terbit</label><input type="date" id="nibDate"></div>
+            <button class="btn" onclick="saveNib()">Simpan NIB</button>
+          </div>
+          <div class="note ok mt">Menyimpan NIB menambah <b>30 poin SkorTumbuh</b> dan menaikkan limit Modal Stok Anda sebesar 20%, karena legalitas usaha memperkecil risiko bagi pemberi pembiayaan.</div>
+        </div>
+
+        <div class="sec">Pertanyaan yang sering muncul</div>
+        <div id="nibFaq"></div>
+        <p class="tiny muted mt" style="line-height:1.8">Informasi di halaman ini merujuk pada layanan resmi pemerintah dan dapat berubah sewaktu-waktu. Selalu pastikan prosedur terbaru langsung di oss.go.id atau kantor DPMPTSP setempat. FinGrow Lite tidak memungut biaya dan tidak mewakili instansi pemerintah mana pun.</p>
+      </section>
+
+      <!-- ===== PROFIL ===== -->
+      <section class="page" id="p-profil">
+        <div class="grid g21">
+          <div class="card">
+            <div class="row" style="gap:14px">
+              <div class="ava" style="width:58px;height:58px;border-radius:18px;font-size:26px" id="pAva">🏪</div>
+              <div style="flex:1;min-width:0">
+                <h3 style="font-size:19px" id="pUsaha">Usaha Saya</h3>
+                <div class="tiny muted" id="pMeta"></div>
+                <div class="row mt-s wrap2" style="gap:6px">
+                  <span class="pill orange" id="pLvl">Usaha Baru</span>
+                  <span class="pill green" id="pKyc">Verifikasi Level 1</span>
+                </div>
+              </div>
+            </div>
+            <div class="grid g3 mt">
+              <div style="text-align:center"><div class="fd b" style="font-size:20px" id="pTx">0</div><div class="tiny muted">Transaksi</div></div>
+              <div style="text-align:center"><div class="fd b" style="font-size:20px" id="pCoin">0</div><div class="tiny muted">Koin</div></div>
+              <div style="text-align:center"><div class="fd b" style="font-size:20px" id="pSkor">500</div><div class="tiny muted">SkorTumbuh</div></div>
+            </div>
+            <button class="btn ghost block mt" onclick="editProfile()">Ubah data usaha</button>
+          </div>
+          <div class="card">
+            <div class="b">Verifikasi berjenjang</div>
+            <div class="tiny muted">Lengkapi bertahap untuk menaikkan limit</div>
+            <div class="mt" id="kycSteps"></div>
+            <button class="btn block mt" id="kycBtn" onclick="doKyc()">Lanjutkan verifikasi</button>
+          </div>
+        </div>
+
+        <div class="sec">Pengaturan</div>
+        <div class="card">
+          <div class="row sp" style="padding:8px 0"><div><div class="b sm">Tema gelap</div><div class="tiny muted">Nyaman dipakai malam hari</div></div><div class="sw" id="swTheme" onclick="toggleTheme()"></div></div>
+          <div class="row sp" style="padding:8px 0;border-top:1px dashed var(--line)"><div><div class="b sm">Pengingat mencatat</div><div class="tiny muted">Ingatkan bila belum mencatat hari ini</div></div><div class="sw on" id="swRemind" onclick="this.classList.toggle('on');toast('Pengaturan pengingat disimpan')"></div></div>
+        </div>
+
+        <div class="sec">Legalitas usaha</div>
+        <div class="card" id="pNib"></div>
+
+        <div class="sec">Mitra Tumbuh terdekat</div>
+        <div class="grid g3" id="mitraList"></div>
+
+        <div class="sec">Data Anda</div>
+        <div class="card">
+          <p class="muted sm" style="line-height:1.75;margin:0">Seluruh catatan disimpan di perangkat ini. Unduh cadangan secara berkala agar data tetap aman bila Anda berganti perangkat atau membersihkan peramban.</p>
+          <div class="row wrap2 mt" style="gap:10px">
+            <button class="btn ghost sm" onclick="exportCSV()">⬇ Unduh CSV</button>
+            <button class="btn ghost sm" onclick="backupJSON()">💾 Cadangkan data</button>
+            <button class="btn ghost sm" onclick="document.getElementById('imp').click()">📂 Pulihkan cadangan</button>
+            <input type="file" id="imp" accept="application/json" style="display:none" onchange="restoreJSON(this)">
+            <button class="btn danger sm" onclick="confirmReset()">Hapus semua data</button>
+          </div>
+        </div>
+        <p class="tiny muted mt" style="text-align:center">FinGrow Lite · versi 1.0 · dibuat untuk usaha kecil Indonesia</p>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<button class="fab" onclick="openTx()">+</button>
+
+<nav class="bnav">
+  <button data-p="home" onclick="show('home')"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Beranda</button>
+  <button data-p="tx" onclick="show('tx')"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Transaksi</button>
+  <button data-p="report" onclick="show('report')"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 15 3.5-4 3 2.5L20 7"/></svg>Laporan</button>
+  <button data-p="learn" onclick="show('learn')"><svg viewBox="0 0 24 24"><path d="m22 9-10-5L2 9l10 5 10-5Z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/></svg>Belajar</button>
+  <button data-p="profil" onclick="show('profil')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.6 3.9-5.6 7.5-5.6s6.7 2 7.5 5.6"/></svg>Profil</button>
+</nav>
+
+<div class="mask" id="mask" onclick="if(event.target===this)closeDlg()"><div class="dlg" id="dlg"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= DATA ================= */
+const KAT_IN=['Penjualan','Jasa','Pendapatan lain'];
+const KAT_OUT=['Belanja Stok','Operasional','Gaji','Sewa','Transport','Pribadi','Lainnya'];
+const LEVELS=[{n:'Usaha Baru',min:0},{n:'Usaha Rapi',min:150},{n:'Usaha Tangguh',min:500},{n:'Usaha Naik Kelas',min:1000}];
+const REWARDS=[
+ {id:'r1',n:'Template Catatan Kas',d:'Format kas harian siap pakai',c:50,e:'📒'},
+ {id:'r2',n:'Kelas Atur Harga Jual',d:'Kelas praktis 45 menit bersama mentor',c:100,e:'🏷️'},
+ {id:'r3',n:'Konsultasi Sahabat Tumbuh',d:'Sesi satu jam dengan pendamping usaha',c:150,e:'🤝'},
+ {id:'r4',n:'Sertifikat Usaha Siap Tumbuh',d:'Bukti kelayakan untuk mitra dan pembeli',c:200,e:'📜'},
+ {id:'r5',n:'Voucher Belanja Stok',d:'Potongan belanja di distributor mitra',c:250,e:'🎟️'}];
+const KYC=[{t:'Identitas Dasar',d:'Nama, nomor HP, dan foto wajah',lim:2000000},
+ {t:'Verifikasi Lanjutan',d:'Foto KTP dan konfirmasi alamat usaha',lim:10000000},
+ {t:'Verifikasi Usaha',d:'Foto tempat usaha dan kunjungan Mitra Tumbuh',lim:25000000}];
+const MITRA=[{n:'Koperasi Sejahtera Mandiri',j:'380 m · 07.00–20.00',e:'🏪'},
+ {n:'Grosir Barokah Jaya',j:'1,1 km · 06.00–21.00',e:'🛒'},
+ {n:'Warung Bu Tini',j:'640 m · 06.00–22.00',e:'☕'}];
+const COURSES=[
+ {id:'c1',cat:'video',e:'🎬',t:'Uang Masuk Bukan Berarti Untung',dur:'3 menit',coin:30,
+  desc:'Banyak pemilik usaha merasa jualannya ramai, tetapi uangnya tidak terasa. Pelajari beda omzet dan untung lewat contoh warung nasi.',
+  poin:['Membedakan uang masuk dan keuntungan','Menghitung sisa uang yang sebenarnya','Mengenali tanda usaha sedang rugi'],
+  quiz:[{q:'Pemasukan Rp500.000 dan biaya Rp380.000. Berapa uang yang tersisa?',o:['Rp500.000','Rp380.000','Rp120.000','Rp880.000'],a:2,ex:'Rp500.000 dikurangi Rp380.000 sama dengan Rp120.000. Angka inilah untung Anda.'},
+        {q:'Warung ramai tetapi uang selalu habis. Langkah pertama yang tepat?',o:['Menaikkan semua harga','Mencatat pengeluaran setiap hari','Menambah pinjaman','Menambah jam buka'],a:1,ex:'Tanpa catatan pengeluaran, kita tidak akan tahu di mana uang bocor.'}],
+  misi:'Catat satu pengeluaran usaha hari ini, sekecil apa pun.'},
+ {id:'c2',cat:'video',e:'💰',t:'Pisahkan Uang Usaha dan Uang Dapur',dur:'4 menit',coin:30,
+  desc:'Uang usaha yang tercampur kebutuhan rumah membuat modal habis tanpa terasa. Ini cara memisahkannya tanpa repot.',
+  poin:['Mengetahui modal usaha yang sebenarnya','Menyiapkan uang belanja stok','Mengurangi kebiasaan memakai dulu lalu diganti'],
+  quiz:[{q:'Uang hasil jualan dipakai belanja dapur. Apa dampaknya?',o:['Aman asal dicatat','Modal belanja stok bisa kurang','Untung bertambah','Pajak berkurang'],a:1,ex:'Modal terpakai sebelum waktunya, sehingga stok berikutnya tidak bisa penuh.'},
+        {q:'Cara paling sederhana memisahkan uang usaha?',o:['Menyimpan di dua tempat berbeda','Menghitung setahun sekali','Menambah utang','Berhenti jualan sementara'],a:0,ex:'Dua tempat terpisah, atau satu catatan khusus usaha, sudah cukup untuk mulai.'}],
+  misi:'Catat rencana belanja stok Anda dengan kategori Belanja Stok.'},
+ {id:'c3',cat:'live',e:'🏷️',t:'Menghitung Harga Jual yang Pas',dur:'Kelas 45 menit',coin:60,
+  desc:'Hitung harga jual berdasarkan biaya bahan, tenaga, dan margin yang wajar, agar tidak menjual rugi tanpa sadar.',
+  poin:['Menyusun harga jual yang tidak merugi','Menghitung biaya yang sering terlupa','Menentukan margin yang masuk akal'],
+  quiz:[{q:'Biaya bahan Rp7.000 per porsi. Untuk margin 40%, harga jual sekitar…',o:['Rp9.800','Rp11.700','Rp7.400','Rp14.000'],a:1,ex:'Sekitar Rp11.700, karena margin dihitung dari harga jual, bukan dari biaya.'},
+        {q:'Biaya mana yang paling sering terlupakan?',o:['Bahan baku','Kemasan dan gas','Harga beli barang','Uang kembalian'],a:1,ex:'Kemasan, gas, dan listrik terus keluar tetapi jarang dihitung.'}],
+  misi:'Hitung ulang harga satu menu andalan, lalu catat penjualannya.'},
+ {id:'c4',cat:'live',e:'📦',t:'Siap Mengajukan Modal Stok',dur:'Kelas 30 menit',coin:60,
+  desc:'Pahami cara kerja pembiayaan stok, apa yang dinilai dari catatan Anda, dan cara mengatur pembayaran agar ringan.',
+  poin:['Memahami penilaian SkorTumbuh','Menyiapkan catatan sebelum mengajukan','Mengatur pembayaran dari perputaran stok'],
+  quiz:[{q:'Modal Stok disalurkan dalam bentuk apa?',o:['Uang tunai','Stok barang lewat distributor','Emas','Voucher belanja daring'],a:1,ex:'Dana langsung ke distributor dalam bentuk barang, sehingga modal tidak terpakai untuk hal lain.'},
+        {q:'Apa yang paling menentukan besar limit?',o:['Pengikut media sosial','Keteraturan catatan transaksi','Luas tempat usaha','Lama berjualan saja'],a:1,ex:'Catatan yang teratur adalah bukti kemampuan bayar yang paling dipercaya.'}],
+  misi:'Lengkapi satu tahap verifikasi di menu Profil.'}];
+
+const DEF={nib:{nomor:'',tgl:''},chk:[],setup:false,profile:{nama:'',usaha:'',kategori:'Kuliner',saldoAwal:0,dibuat:null},
+ tx:[],coin:0,kyc:1,done:[],owned:[],log:[],misiClaimed:[],loan:null,theme:'light'};
+let db=load(),page='home',curCourse=null,qi=0,txEdit=null;
+
+function load(){try{const r=localStorage.getItem('fingrow.app');if(r)return Object.assign(JSON.parse(JSON.stringify(DEF)),JSON.parse(r));}catch(e){}
+ return JSON.parse(JSON.stringify(DEF));}
+function save(){try{localStorage.setItem('fingrow.app',JSON.stringify(db));}catch(e){toast('Penyimpanan peramban penuh atau diblokir');}}
+
+/* ================= UTIL ================= */
+const rp=n=>'Rp'+Math.round(n).toLocaleString('id-ID');
+const rpS=n=>{const a=Math.abs(n);if(a>=1e9)return 'Rp'+(n/1e9).toFixed(1).replace('.',',')+'M';if(a>=1e6)return 'Rp'+(n/1e6).toFixed(1).replace('.',',')+'jt';if(a>=1e3)return 'Rp'+Math.round(n/1e3)+'rb';return 'Rp'+n;};
+const iso=d=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');};
+const today=()=>iso(new Date());
+const HARI=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BULAN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+function tglLabel(s){const d=new Date(s+'T00:00:00'),t=today();
+ if(s===t)return 'Hari ini';const y=new Date();y.setDate(y.getDate()-1);if(s===iso(y))return 'Kemarin';
+ return HARI[d.getDay()]+', '+d.getDate()+' '+BULAN[d.getMonth()];}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('on'),2800);}
+function dlg(html){document.getElementById('dlg').innerHTML=html;document.getElementById('mask').classList.add('on');}
+function closeDlg(){try{stopVoice();}catch(e){}document.getElementById('mask').classList.remove('on');}
+function esc(s){return String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));}
+function parseNum(v){return parseInt(String(v).replace(/\D/g,''),10)||0;}
+
+/* ================= DERIVED ================= */
+const saldo=()=>db.profile.saldoAwal+db.tx.reduce((a,t)=>a+(t.t==='in'?t.a:-t.a),0);
+const sumBy=(f)=>db.tx.filter(f).reduce((a,t)=>a+t.a,0);
+const txToday=()=>db.tx.filter(t=>t.d===today());
+function streak(){let n=0,d=new Date();
+ for(;;){const s=iso(d);if(db.tx.some(t=>t.d===s)){n++;d.setDate(d.getDate()-1);}else{if(s===today()){d.setDate(d.getDate()-1);continue;}break;}if(n>400)break;}
+ return n;}
+function activeDays(days){const set=new Set();const lim=new Date();lim.setDate(lim.getDate()-days);
+ db.tx.forEach(t=>{if(new Date(t.d)>=lim)set.add(t.d);});return set.size;}
+function skor(){let s=500;
+ s+=Math.min(140,activeDays(30)*7);
+ s+=Math.min(80,db.tx.length*4);
+ s+=(db.kyc-1)*40;
+ s+=db.done.length*15;
+ s+=Math.min(40,streak()*6);
+ if(db.nib&&db.nib.nomor)s+=30;
+ return Math.max(300,Math.min(900,Math.round(s)));}
+function skorLvl(){const s=skor();return s>=820?'Level 4 · Sangat Baik':s>=740?'Level 3 · Baik':s>=640?'Level 2 · Cukup':'Level 1 · Awal';}
+function levelOf(c){let l=LEVELS[0];LEVELS.forEach(x=>{if(c>=x.min)l=x;});return l;}
+function nextLevel(c){return LEVELS.find(x=>x.min>c)||null;}
+function faktor(){return[
+ {t:'Konsistensi harian',v:Math.min(100,activeDays(30)/20*100),d:activeDays(30)+' hari aktif dalam 30 hari'},
+ {t:'Jumlah catatan',v:Math.min(100,db.tx.length/20*100),d:db.tx.length+' transaksi tercatat'},
+ {t:'Kelengkapan verifikasi',v:(db.kyc-1)/2*100,d:'Level '+db.kyc+' dari 3'},
+ {t:'Pemahaman keuangan',v:db.done.length/COURSES.length*100,d:db.done.length+' modul selesai'}];}
+const MISI=[{id:'m1',t:'Catat 3 transaksi hari ini',c:15,e:'✏️',p:()=>Math.min(txToday().length,3),max:3},
+ {id:'m2',t:'Catat 1 pengeluaran',c:10,e:'🛒',p:()=>Math.min(txToday().filter(t=>t.t==='out').length,1),max:1},
+ {id:'m3',t:'Selesaikan 1 modul Academy',c:25,e:'🎓',p:()=>Math.min(db.done.length,1),max:1},
+ {id:'m4',t:'Periksa laporan bulan ini',c:5,e:'📊',p:()=>db.seenReport?1:0,max:1}];
+function checkMisi(){MISI.forEach(m=>{if(m.p()>=m.max&&!db.misiClaimed.includes(m.id)){db.misiClaimed.push(m.id);addCoin(m.c,'Misi: '+m.t);toast('Misi selesai! +'+m.c+' koin — '+m.t);}});save();}
+function addCoin(n,why){db.coin=Math.max(0,db.coin+n);db.log.unshift({n,why,w:new Date().toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})});
+ if(db.log.length>20)db.log.pop();save();}
+function syarat(){return[{t:'SkorTumbuh minimal 640',ok:skor()>=640,now:skor()+' dari 640'},
+ {t:'Verifikasi minimal Level 2',ok:db.kyc>=2,now:'Level '+db.kyc+' dari 2'},
+ {t:'Minimal 15 transaksi tercatat',ok:db.tx.length>=15,now:db.tx.length+' dari 15'},
+ {t:'Aktif mencatat minimal 7 hari',ok:activeDays(30)>=7,now:activeDays(30)+' dari 7 hari'}];}
+function limitStok(){if(!syarat().every(s=>s.ok))return 0;
+ const omzet=sumBy(t=>t.t==='in'&&new Date(t.d)>=new Date(Date.now()-30*864e5));
+ const bonus=(db.nib&&db.nib.nomor)?1.2:1;
+ return Math.max(500000,Math.min(5000000,Math.round(omzet*0.6*bonus/250000)*250000));}
+function dailyReset(){if(db.misiDate!==today()){db.misiDate=today();db.misiClaimed=[];db.seenReport=false;save();}}
+
+/* ================= NAV ================= */
+const TITLES={home:['Beranda','Ringkasan usaha Anda hari ini'],tx:['Transaksi','Semua catatan pemasukan dan pengeluaran'],
+ report:['Laporan','Laba, pengeluaran, dan kebiasaan belanja'],learn:['Belajar','Modul singkat yang langsung bisa dipraktikkan'],
+ reward:['Rewards','Koin Tumbuh dan penukarannya'],skor:['SkorTumbuh','Rekam jejak yang membuka akses modal'],
+ modal:['Modal Stok','Pembiayaan stok berbasis catatan Anda'],
+ nib:['Izin Usaha (NIB)','Cara mengurus Nomor Induk Berusaha lewat jalur resmi pemerintah'],profil:['Profil & Pengaturan','Data usaha, verifikasi, dan cadangan data']};
+function show(p){page=p;
+ document.querySelectorAll('.page').forEach(s=>s.classList.toggle('on',s.id==='p-'+p));
+ document.querySelectorAll('.navi,.bnav button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+ document.getElementById('pgTitle').textContent=TITLES[p][0];
+ document.getElementById('pgSub').textContent=TITLES[p][1];
+ document.getElementById('side').classList.remove('open');document.getElementById('scrim').classList.remove('on');
+ if(p==='report'){db.seenReport=true;save();checkMisi();}
+ window.scrollTo({top:0,behavior:'smooth'});
+ render();}
+function toggleSide(){document.getElementById('side').classList.toggle('open');document.getElementById('scrim').classList.toggle('on');}
+function toggleTheme(){db.theme=db.theme==='dark'?'light':'dark';applyTheme();save();}
+function applyTheme(){document.documentElement.dataset.theme=db.theme;
+ document.getElementById('themeBtn').textContent=db.theme==='dark'?'☀️':'🌙';
+ document.getElementById('swTheme').classList.toggle('on',db.theme==='dark');}
+
+/* ================= SETUP ================= */
+function wgo(i){document.querySelectorAll('.wstep').forEach((s,j)=>s.classList.toggle('on',j===i));
+ document.querySelectorAll('#wDots i').forEach((d,j)=>d.classList.toggle('on',j===i));}
+function setSaldo(v){document.getElementById('wSaldo').value=v.toLocaleString('id-ID');}
+function finishSetup(){const nama=document.getElementById('wNama').value.trim()||'Sahabat';
+ db.profile={nama,usaha:document.getElementById('wUsaha').value.trim()||('Usaha '+nama),
+  kategori:document.getElementById('wKategori').value,saldoAwal:parseNum(document.getElementById('wSaldo').value),dibuat:today()};
+ db.setup=true;save();document.getElementById('welcome').classList.remove('on');render();
+ setTimeout(()=>toast('Selamat datang, '+db.profile.nama+'! Mulai dengan mencatat satu transaksi.'),600);}
+
+/* ================= TRANSAKSI ================= */
+function openTx(type,id){txEdit=id||null;
+ const t=id?db.tx.find(x=>x.id===id):null;
+ const jenis=t?t.t:(type||'in');
+ const vok=voiceOK();
+ const EX=['Jual nasi kuning 20 porsi 300 ribu','Beli minyak goreng 2 liter 36 ribu','Bayar listrik 120 ribu'];
+ dlg(`<div class="row sp"><h3 style="font-size:19px">${t?'Ubah transaksi':'Catat transaksi'}</h3><button class="icobtn" onclick="closeDlg()">✕</button></div>
+  ${t?'':`<div class="seg mt"><button id="mVoice" class="on" onclick="setInput('voice')">🎙️ Suara</button><button id="mType" onclick="setInput('type')">⌨️ Ketik</button></div>`}
+
+  <div id="paneVoice" style="display:${t?'none':'block'}">
+   <div class="micbox">
+    <button class="mic ${vok?'':'off'}" id="micBtn" onclick="toggleVoice()" title="${vok?'Tekan untuk mulai merekam':'Tidak didukung peramban ini'}">🎙️</button>
+    <div class="wave" id="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="b micLbl" id="micLbl">${vok?'Tekan lalu ucapkan transaksinya':'Peramban ini belum mendukung suara'}</div>
+    <div class="tiny muted mt-s" id="micHint">${vok?'Contoh: “Jual gula 5 kilo 90 ribu”':'Tuliskan kalimatnya di kolom bawah, hasilnya sama'}</div>
+   </div>
+   <div id="heard" style="display:none"></div>
+   <div class="note mt"><b style="font-size:12px;letter-spacing:.3px">CONTOH KALIMAT YANG DIKENALI</b>
+    ${EX.map(e=>`<button class="ex" onclick="runSentence('${e}')">“${e}”</button>`).join('')}</div>
+   <label>Atau tulis kalimatnya</label>
+   <div class="row" style="gap:8px">
+    <input id="sentence" placeholder="Jual gula 5 kilo 90 ribu" onkeydown="if(event.key==='Enter'){event.preventDefault();runSentence()}">
+    <button class="btn" onclick="runSentence()">Proses</button></div>
+   <p class="tiny muted mt-s">Sebutkan jenisnya (jual, beli, bayar), barangnya, dan jumlah uangnya. Hasilnya bisa Anda periksa sebelum disimpan.</p>
+  </div>
+
+  <div id="paneType" style="display:${t?'block':'none'}">
+   <div id="fromVoice"></div>
+   <div class="seg mt"><button id="jIn" class="${jenis==='in'?'on':''}" onclick="pickJenis('in')">💰 Pemasukan</button><button id="jOut" class="${jenis==='out'?'on':''}" onclick="pickJenis('out')">🛒 Pengeluaran</button></div>
+   <label>Jumlah (Rp)</label>
+   <input id="fAmt" inputmode="numeric" placeholder="0" value="${t?t.a.toLocaleString('id-ID'):''}" oninput="this.value=fmtInput(this.value)" style="font-size:22px;font-weight:700;font-family:'Plus Jakarta Sans'">
+   <div class="chips mt-s" id="quickAmt"></div>
+   <label>Keterangan</label>
+   <input id="fDesc" placeholder="Contoh: Jual nasi kuning 20 porsi" value="${t?esc(t.desc):''}">
+   <label>Kategori</label>
+   <div class="chips" id="fKat"></div>
+   <label>Tanggal</label>
+   <input type="date" id="fDate" value="${t?t.d:today()}" max="${today()}">
+   <div class="row mt-l" style="gap:10px">
+    ${t?`<button class="btn danger" onclick="delTx('${t.id}')">Hapus</button>`:''}
+    <button class="btn block" style="flex:1" onclick="saveTx()">${t?'Simpan perubahan':'Simpan transaksi'}</button>
+   </div>
+  </div>`);
+ pickJenis(jenis,t?t.kat:null);
+ if(t)setTimeout(()=>document.getElementById('fAmt').focus(),120);}
+
+function setInput(m){const v=m==='voice';
+ document.getElementById('paneVoice').style.display=v?'block':'none';
+ document.getElementById('paneType').style.display=v?'none':'block';
+ document.getElementById('mVoice').classList.toggle('on',v);
+ document.getElementById('mType').classList.toggle('on',!v);
+ if(!v){stopVoice();setTimeout(()=>document.getElementById('fAmt').focus(),80);}}
+
+/* ---------- PENGENALAN SUARA ---------- */
+let rec=null,listening=false;
+function voiceOK(){return !!(window.SpeechRecognition||window.webkitSpeechRecognition);}
+function micUI(state,label,hint){const m=document.getElementById('micBtn');if(!m)return;
+ m.classList.toggle('rec',state==='rec');
+ document.getElementById('wave').classList.toggle('on',state==='rec');
+ m.textContent=state==='rec'?'⏹':'🎙️';
+ if(label)document.getElementById('micLbl').textContent=label;
+ if(hint)document.getElementById('micHint').textContent=hint;}
+function toggleVoice(){
+ if(!voiceOK()){toast('Peramban ini belum mendukung suara. Tulis kalimatnya di bawah.');
+  const el=document.getElementById('sentence');el&&el.focus();return;}
+ listening?stopVoice():startVoice();}
+function startVoice(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ try{rec=new SR();}catch(e){toast('Mikrofon tidak bisa diakses');return;}
+ rec.lang='id-ID';rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1;
+ let fin='';
+ rec.onstart=()=>{listening=true;micUI('rec','Mendengarkan…','Ucapkan sekarang, tekan lagi untuk berhenti');
+  showHeard('',true);};
+ rec.onresult=e=>{let live='';fin='';
+  for(let i=0;i<e.results.length;i++){const r=e.results[i];r.isFinal?fin+=r[0].transcript:live+=r[0].transcript;}
+  showHeard(fin,true,live);};
+ rec.onerror=e=>{listening=false;micUI('idle','Tekan lalu ucapkan transaksinya','Contoh: “Jual gula 5 kilo 90 ribu”');
+  const msg={'not-allowed':'Akses mikrofon ditolak. Izinkan mikrofon lewat pengaturan peramban.','service-not-allowed':'Akses mikrofon ditolak peramban.','no-speech':'Tidak ada suara yang terdengar. Coba lagi ya.','audio-capture':'Mikrofon tidak ditemukan di perangkat ini.','network':'Pengenalan suara butuh koneksi internet.'};
+  toast(msg[e.error]||'Suara tidak terbaca, coba ulangi.');};
+ rec.onend=()=>{listening=false;micUI('idle','Tekan lalu ucapkan transaksinya','Contoh: “Jual gula 5 kilo 90 ribu”');
+  if(fin.trim())handleSentence(fin.trim());};
+ try{rec.start();}catch(e){toast('Mikrofon sedang dipakai proses lain');}}
+function stopVoice(){if(rec&&listening){try{rec.stop();}catch(e){}}listening=false;micUI('idle');}
+function showHeard(txt,show,live){const h=document.getElementById('heard');if(!h)return;
+ if(!show){h.style.display='none';return;}
+ h.style.display='block';h.className='heard';
+ h.innerHTML=(txt||live)?`<span class="tiny muted b">TERDENGAR</span><br><span class="txt">${esc(txt||'')}</span><span class="int">${esc(live||'')}</span>`
+  :`<span class="tiny muted b">MENDENGARKAN…</span><br><span class="int">Ucapkan transaksi Anda sekarang</span>`;}
+
+/* ---------- PENGURAI KALIMAT ---------- */
+const ANGKA={nol:0,satu:1,dua:2,tiga:3,empat:4,lima:5,enam:6,tujuh:7,delapan:8,sembilan:9};
+const KATA_ANGKA=/^(nol|satu|dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh|sebelas|belas|puluh|seratus|ratus|seribu|ribu|rb|rebu|juta|jt|perak|rupiah|setengah|\d[\d.,]*)$/i;
+function kataKeAngka(txt){
+ const tok=txt.split(' '),out=[];
+ let total=0,num=0,last=null,aktif=false;
+ const nilai=()=>total+num+(last||0);
+ const flush=()=>{if(aktif){out.push(String(nilai()));}total=0;num=0;last=null;aktif=false;};
+ for(const w of tok){
+  if(w==='')continue;
+  if(/^\d+([.,]\d+)?$/.test(w)){flush();last=parseFloat(w.replace(',','.'));aktif=true;continue;}
+  if(w in ANGKA){last=(last===null?0:last)+ANGKA[w];aktif=true;continue;}
+  if(w==='sepuluh'){num+=10;aktif=true;last=null;continue;}
+  if(w==='sebelas'){num+=11;aktif=true;last=null;continue;}
+  if(w==='belas'){num+=10+(last===null?1:last);last=null;aktif=true;continue;}
+  if(w==='puluh'){num+=(last===null?1:last)*10;last=null;aktif=true;continue;}
+  if(w==='seratus'){num+=100;aktif=true;last=null;continue;}
+  if(w==='ratus'){num+=(last===null?1:last)*100;last=null;aktif=true;continue;}
+  if(w==='seribu'){total+=1000;aktif=true;num=0;last=null;continue;}
+  if(w==='ribu'||w==='rb'||w==='rebu'){const v=num+(last||0);total+=(v||1)*1000;num=0;last=null;aktif=true;continue;}
+  if(w==='juta'||w==='jt'){const v=num+(last||0);total+=(v||1)*1e6;num=0;last=null;aktif=true;continue;}
+  flush();out.push(w);}
+ flush();return out.join(' ');}
+const QTY=/^\s*(kilo|kilogram|kg|gram|ons|liter|ltr|porsi|gelas|bungkus|biji|buah|butir|ikat|pcs|pack|dus|kotak|lusin|potong|piring|cup|botol|sachet|renceng|karung|meter|orang|kali)\b/;
+function parseSpeech(raw){
+ const asli=String(raw).trim();
+ let s=' '+asli.toLowerCase()
+   .replace(/(\d)[.,](\d)/g,'$1.$2')
+   .replace(/[!?;:"()]/g,' ')
+   .replace(/([^\d\s])[.,]/g,'$1 ')
+   .replace(/\s+/g,' ')+' ';
+ const konv=' '+kataKeAngka(s.trim())+' ';
+ const MASUK=/\b(jual|terjual|laku|laris|dapat|dapet|terima|masuk|pemasukan|omzet|penjualan|pesanan|order)\b/;
+ const KELUAR=/\b(beli|belanja|kulakan|bayar|setor|keluar|pengeluaran|biaya|ongkos|sewa|gaji|upah|iuran|retribusi|stok|isi)\b/;
+ let jenis=MASUK.test(konv)?'in':(KELUAR.test(konv)?'out':null);
+ if(/\b(jual|terjual|laku)\b/.test(konv))jenis='in';
+ if(/\b(beli|belanja|kulakan|bayar)\b/.test(konv)&&!/\b(jual|terjual|laku)\b/.test(konv))jenis='out';
+ let kat;
+ if(jenis==='in'){
+  kat=/\b(jasa|servis|reparasi|jahit|cuci|catering|antar|ojek|pijat|potong rambut|perbaikan)\b/.test(konv)?'Jasa':'Penjualan';
+ }else{
+  if(/\b(gaji|upah|karyawan|pegawai)\b/.test(konv))kat='Gaji';
+  else if(/\b(sewa|kontrak|kios|lapak|ruko)\b/.test(konv))kat='Sewa';
+  else if(/\b(bensin|solar|ongkos|transport|angkut|kirim|parkir|tol|ojek)\b/.test(konv))kat='Transport';
+  else if(/\b(stok|kulakan|grosir|bahan|sembako|beras|minyak|gula|tepung|telur|ayam|daging|sayur|bumbu|kopi|susu|mie)\b/.test(konv))kat='Belanja Stok';
+  else if(/\b(listrik|air|pdam|gas|wifi|internet|pulsa|sampah|retribusi|kebersihan|plastik|kemasan|servis alat|perbaikan)\b/.test(konv))kat='Operasional';
+  else if(/\b(pribadi|dapur|jajan|rumah|sekolah|arisan)\b/.test(konv))kat='Pribadi';
+  else kat='Lainnya';}
+ let amt=0;
+ const re=/(\d+(?:\.\d+)?)\s*(juta|jt|ribu|rb|rebu)?/g,kand=[];let m;
+ while((m=re.exec(konv))!==null){
+  const after=konv.slice(m.index+m[0].length);
+  if(QTY.test(after))continue;
+  let v=parseFloat(m[1]);const u=(m[2]||'').trim();
+  if(u==='juta'||u==='jt')v*=1e6;else if(u)v*=1e3;else if(v<1000)v*=1000;
+  kand.push(v);}
+ if(kand.length)amt=Math.round(Math.max(...kand));
+ let kata=asli.replace(/\s+/g,' ').trim().split(' ');
+ while(kata.length&&KATA_ANGKA.test(kata[kata.length-1]))kata.pop();
+ let desc=kata.join(' ').replace(/\s*(seharga|senilai|sebesar|sejumlah|dengan harga|harga)\s*$/i,'').trim();
+ if(!desc||desc.length<2)desc=jenis==='in'?'Penjualan':'Pengeluaran usaha';
+ desc=desc.charAt(0).toUpperCase()+desc.slice(1);
+ return{jenis:jenis||'out',kat,amt,desc,asli};}
+
+function runSentence(txt){const el=document.getElementById('sentence');
+ const kal=(txt||(el?el.value:'')||'').trim();
+ if(!kal){toast('Tulis atau ucapkan kalimatnya dulu');el&&el.focus();return;}
+ if(el&&!txt)el.value='';
+ handleSentence(kal);}
+function handleSentence(kal){const p=parseSpeech(kal);
+ showHeard(kal,true);
+ if(!p.amt){
+  const h=document.getElementById('heard');
+  if(h)h.innerHTML+=`<div class="tiny mt-s" style="color:var(--orange)">Jumlah uangnya belum terdengar. Sebutkan nominalnya, contoh “…sembilan puluh ribu”.</div>`;
+  toast('Nominal belum terbaca, coba sebutkan jumlahnya');return;}
+ setInput('type');
+ pickJenis(p.jenis,p.kat);
+ document.getElementById('fAmt').value=p.amt.toLocaleString('id-ID');
+ document.getElementById('fDesc').value=p.desc;
+ document.getElementById('fromVoice').innerHTML=`<div class="parsed">
+  <div class="row sp"><b>🎙️ Dikenali dari suara</b><button class="btn sm ghost" onclick="setInput('voice')">Ulangi</button></div>
+  <div class="mt-s">“${esc(p.asli)}” → <b>${p.jenis==='in'?'Pemasukan':'Pengeluaran'} ${rp(p.amt)}</b>, kategori <b>${p.kat}</b>.</div>
+  <div class="tiny mt-s">Periksa dulu, ubah bila ada yang kurang pas, lalu simpan.</div></div>`;
+ toast('Transaksi dikenali — periksa lalu simpan');}
+function fmtInput(v){const n=parseNum(v);return n?n.toLocaleString('id-ID'):'';}
+let curJenis='in',curKat='Penjualan';
+function pickJenis(j,keep){curJenis=j;
+ document.getElementById('jIn').classList.toggle('on',j==='in');
+ document.getElementById('jOut').classList.toggle('on',j==='out');
+ const list=j==='in'?KAT_IN:KAT_OUT;curKat=keep&&list.includes(keep)?keep:list[0];
+ document.getElementById('fKat').innerHTML=list.map(k=>`<button class="${k===curKat?'on':''}" onclick="pickKat(this,'${k}')">${k}</button>`).join('');
+ const qa=j==='in'?[10000,25000,50000,100000]:[5000,20000,50000,150000];
+ document.getElementById('quickAmt').innerHTML=qa.map(v=>`<button onclick="addAmt(${v})">+${rpS(v)}</button>`).join('');}
+function pickKat(el,k){curKat=k;[...el.parentNode.children].forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+function addAmt(v){const el=document.getElementById('fAmt');el.value=(parseNum(el.value)+v).toLocaleString('id-ID');}
+function saveTx(){const a=parseNum(document.getElementById('fAmt').value);
+ if(!a){toast('Isi jumlahnya dulu ya');return;}
+ const desc=document.getElementById('fDesc').value.trim()||(curJenis==='in'?'Penjualan':'Pengeluaran usaha');
+ const d=document.getElementById('fDate').value||today();
+ if(txEdit){const t=db.tx.find(x=>x.id===txEdit);Object.assign(t,{a,desc,kat:curKat,d,t:curJenis});toast('Transaksi diperbarui');}
+ else{db.tx.unshift({id:'t'+Date.now(),a,desc,kat:curKat,d,t:curJenis});addCoin(5,'Mencatat transaksi');}
+ db.tx.sort((x,y)=>y.d.localeCompare(x.d)||y.id.localeCompare(x.id));
+ save();checkMisi();closeDlg();render();
+ if(!txEdit)setTimeout(()=>{const s=skor();
+  dlg(`<div class="pop" style="background:var(--green-l)">✅</div>
+   <h3 style="text-align:center;font-size:19px">Tersimpan</h3>
+   <p class="muted sm" style="text-align:center;margin-top:4px">${esc(desc)} · ${curJenis==='in'?'+':'−'}${rp(a)}</p>
+   <div class="card mt" style="background:var(--surface-2)">
+    <div class="kv"><span class="muted">Saldo usaha kini</span><span class="b">${rp(saldo())}</span></div>
+    <div class="kv"><span class="muted">Koin Tumbuh</span><span class="b">+5 🌱 (total ${db.coin})</span></div>
+    <div class="kv"><span class="muted">SkorTumbuh</span><span class="b">${s}</span></div></div>
+   <div class="row mt-l" style="gap:10px">
+    <button class="btn ghost" onclick="closeDlg();openTx()">Catat lagi</button>
+    <button class="btn" style="flex:1" onclick="closeDlg()">Selesai</button></div>`);},250);
+ txEdit=null;}
+function delTx(id){db.tx=db.tx.filter(t=>t.id!==id);save();closeDlg();render();toast('Transaksi dihapus');}
+
+function filtered(){const q=(document.getElementById('q').value||'').toLowerCase();
+ const ty=document.getElementById('fType').value,rg=document.getElementById('fRange').value;
+ const lim=rg==='all'?null:new Date(Date.now()-(+rg)*864e5);
+ return db.tx.filter(t=>(ty==='all'||t.t===ty)&&(!lim||new Date(t.d)>=lim)&&
+  (!q||t.desc.toLowerCase().includes(q)||t.kat.toLowerCase().includes(q)));}
+function txRow(t,clickable){return `<div class="txr" ${clickable?`onclick="openTx(null,'${t.id}')" style="cursor:pointer"`:''}>
+ <div class="ic" style="background:${t.t==='in'?'var(--green-l)':'var(--red-l)'}">${t.t==='in'?'💰':'🛒'}</div>
+ <div style="min-width:0"><div class="b sm" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.desc)}</div>
+ <div class="tiny muted">${t.kat}</div></div>
+ <div class="amt ${t.t}">${t.t==='in'?'+':'−'} ${rp(t.a)}</div></div>`;}
+function renderTx(){const list=filtered();
+ const i=list.filter(t=>t.t==='in').reduce((a,b)=>a+b.a,0),o=list.filter(t=>t.t==='out').reduce((a,b)=>a+b.a,0);
+ document.getElementById('tIn').textContent=rp(i);document.getElementById('tOut').textContent=rp(o);
+ document.getElementById('tNet').textContent=rp(i-o);
+ document.getElementById('tNet').className='v '+(i-o>=0?'in':'out');
+ document.getElementById('tInSub').textContent=list.filter(t=>t.t==='in').length+' transaksi';
+ document.getElementById('tOutSub').textContent=list.filter(t=>t.t==='out').length+' transaksi';
+ document.getElementById('tNetSub').textContent=i-o>=0?'Usaha Anda surplus':'Pengeluaran melebihi pemasukan';
+ const box=document.getElementById('txList');
+ if(!list.length){box.innerHTML=`<div class="empty"><div class="e">🗒️</div><div class="b">Belum ada transaksi</div>
+  <p class="sm muted">Mulai dengan mencatat penjualan pertama Anda hari ini.</p>
+  <button class="btn mt" onclick="openTx()">+ Catat Transaksi</button></div>`;return;}
+ const grp={};list.forEach(t=>{(grp[t.d]=grp[t.d]||[]).push(t);});
+ box.innerHTML=Object.keys(grp).sort((a,b)=>b.localeCompare(a)).map(d=>{
+  const day=grp[d],net=day.reduce((a,t)=>a+(t.t==='in'?t.a:-t.a),0);
+  return `<div class="daygrp row sp"><span>${tglLabel(d)}</span><span class="${net>=0?'in':'out'}">${net>=0?'+':'−'}${rp(Math.abs(net))}</span></div>`+
+   day.map(t=>txRow(t,true)).join('');}).join('');}
+
+/* ================= CHART ================= */
+function chart(el,data){const max=Math.max(1,...data.map(d=>Math.max(d.in,d.out)));
+ el.innerHTML=data.map(d=>`<div class="col" title="${d.lb}: masuk ${rp(d.in)}, keluar ${rp(d.out)}">
+  <div class="stack"><div class="bi" style="height:${d.in/max*100}%"></div><div class="bo" style="height:${d.out/max*100}%"></div></div>
+  <div class="lb">${d.lb}</div></div>`).join('');}
+function last7(){const out=[];for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const s=iso(dt);
+ out.push({lb:HARI[dt.getDay()].slice(0,3),in:sumBy(t=>t.d===s&&t.t==='in'),out:sumBy(t=>t.d===s&&t.t==='out')});}return out;}
+
+/* ================= LAPORAN ================= */
+function months(){const set=new Set(db.tx.map(t=>t.d.slice(0,7)));set.add(today().slice(0,7));
+ return [...set].sort().reverse();}
+function renderReport(){const sel=document.getElementById('repMonth');
+ const ms=months();if(sel.options.length!==ms.length)sel.innerHTML=ms.map(m=>`<option value="${m}">${BULAN[+m.slice(5)-1]} ${m.slice(0,4)}</option>`).join('');
+ const m=sel.value||ms[0];sel.value=m;
+ const inTx=db.tx.filter(t=>t.d.startsWith(m)&&t.t==='in'),outTx=db.tx.filter(t=>t.d.startsWith(m)&&t.t==='out');
+ const i=inTx.reduce((a,b)=>a+b.a,0),o=outTx.reduce((a,b)=>a+b.a,0);
+ document.getElementById('rIn').textContent=rp(i);document.getElementById('rOut').textContent=rp(o);
+ document.getElementById('rProfit').textContent=rp(i-o);
+ document.getElementById('rProfit').className='v '+(i-o>=0?'in':'out');
+ document.getElementById('rMargin').textContent=i?Math.round((i-o)/i*100)+'%':'—';
+ const wk=[0,1,2,3].map(w=>({lb:'Mg '+(w+1),in:0,out:0}));
+ db.tx.filter(t=>t.d.startsWith(m)).forEach(t=>{const w=Math.min(3,Math.floor((+t.d.slice(8)-1)/7));wk[w][t.t]+=t.a;});
+ chart(document.getElementById('chartWeek'),wk);
+ const breakdown=(arr,tot,el)=>{const by={};arr.forEach(t=>by[t.kat]=(by[t.kat]||0)+t.a);
+  const ks=Object.keys(by).sort((a,b)=>by[b]-by[a]);
+  document.getElementById(el).innerHTML=ks.length?ks.map(k=>`<div class="catrow">
+   <div class="nm"><div class="row sp"><span class="sm b">${k}</span><span class="sm b">${rp(by[k])}</span></div>
+   <div class="bar mt-s" style="height:7px"><i style="width:${by[k]/Math.max(tot,1)*100}%"></i></div>
+   <div class="tiny muted mt-s">${Math.round(by[k]/Math.max(tot,1)*100)}% dari total</div></div></div>`).join('')
+   :'<div class="empty sm">Belum ada data pada periode ini</div>';};
+ breakdown(outTx,o,'catBreak');breakdown(inTx,i,'catIn');
+ const box=document.getElementById('insightBox');
+ if(!i&&!o){box.innerHTML='<div class="empty"><div class="e">📊</div><div class="b">Belum ada data bulan ini</div><p class="sm muted">Catat transaksi agar laporan bisa dihitung.</p></div>';return;}
+ const byKat={};outTx.forEach(t=>byKat[t.kat]=(byKat[t.kat]||0)+t.a);
+ const topKat=Object.keys(byKat).sort((a,b)=>byKat[b]-byKat[a])[0];
+ const hariAktif=new Set(db.tx.filter(t=>t.d.startsWith(m)).map(t=>t.d)).size;
+ const margin=i?Math.round((i-o)/i*100):0;
+ let pesan=[];
+ pesan.push(i-o>=0?`Bulan ini usaha Anda <b>surplus ${rp(i-o)}</b> dengan margin ${margin}%.`:`Bulan ini pengeluaran melebihi pemasukan sebesar <b>${rp(o-i)}</b>. Periksa kembali kategori terbesar.`);
+ if(topKat)pesan.push(`Pengeluaran terbesar ada pada kategori <b>${topKat}</b> (${rp(byKat[topKat])}).`);
+ pesan.push(`Anda mencatat pada <b>${hariAktif} hari</b> bulan ini. ${hariAktif>=20?'Konsistensi Anda sangat baik.':'Menambah hari mencatat akan menaikkan SkorTumbuh Anda.'}`);
+ if(byKat['Pribadi'])pesan.push(`Ada ${rp(byKat['Pribadi'])} pengeluaran pribadi yang tercampur. Memisahkannya membantu Anda melihat laba usaha yang sebenarnya.`);
+ box.innerHTML=`<div class="b">Ringkasan bulan ini</div><div class="mt-s sm muted" style="line-height:2">${pesan.map(p=>'• '+p).join('<br>')}</div>`;}
+
+/* ================= ACADEMY ================= */
+function openCourse(id){curCourse=COURSES.find(c=>c.id===id);qi=0;
+ const c=curCourse,done=db.done.includes(id);
+ dlg(`<div class="row sp"><span class="pill blue">${c.cat==='live'?'Kelas praktis':'Video pendek'} · ${c.dur}</span><button class="icobtn" onclick="closeDlg()">✕</button></div>
+  <div class="mt" style="aspect-ratio:16/9;border-radius:18px;background:linear-gradient(135deg,var(--a5),var(--a2));display:grid;place-items:center;font-size:54px;color:#fff">${c.e}</div>
+  <h3 class="mt" style="font-size:20px">${c.t}</h3>
+  <p class="muted sm mt-s" style="line-height:1.75">${c.desc}</p>
+  <div class="note mt"><b>Setelah modul ini Anda bisa</b><br>${c.poin.map(p=>'• '+p).join('<br>')}</div>
+  <button class="btn block mt-l" onclick="startQuiz()">${done?'Ulangi kuis':'Lanjut ke kuis kilat'}</button>
+  <p class="tiny muted mt-s" style="text-align:center">Kuis hanya ${c.quiz.length} soal dan tidak ada nilai gagal.</p>`);}
+function startQuiz(){qi=0;renderQuiz();}
+function renderQuiz(){const c=curCourse,q=c.quiz[qi];
+ dlg(`<div class="row sp"><span class="pill blue">Soal ${qi+1} dari ${c.quiz.length}</span><button class="icobtn" onclick="closeDlg()">✕</button></div>
+  <div class="bar mt"><i style="width:${(qi+1)/c.quiz.length*100}%"></i></div>
+  <h3 class="mt-l" style="font-size:18px;line-height:1.55">${q.q}</h3>
+  <div class="mt" id="opts">${q.o.map((o,i)=>`<button class="opt" onclick="answer(this,${i})">${o}</button>`).join('')}</div>
+  <div id="feed"></div>`);}
+function answer(el,i){const q=curCourse.quiz[qi],w=el.parentNode;if(w.dataset.lock)return;w.dataset.lock='1';
+ [...w.children].forEach((b,j)=>{if(j===q.a)b.classList.add('ok');else if(j===i)b.classList.add('no');});
+ document.getElementById('feed').innerHTML=`<div class="note ${i===q.a?'ok':'warn'} mt"><b>${i===q.a?'Tepat sekali':'Belum tepat'}</b><br>${q.ex}</div>
+  <button class="btn block mt" onclick="nextQ()">${qi<curCourse.quiz.length-1?'Soal berikutnya':'Lanjut ke misi praktik'}</button>`;}
+function nextQ(){if(qi<curCourse.quiz.length-1){qi++;renderQuiz();}else misiPraktik();}
+function misiPraktik(){const c=curCourse;
+ dlg(`<div class="pop" style="background:var(--blue-l)">🎯</div>
+  <h3 style="text-align:center;font-size:19px">Misi praktik</h3>
+  <p class="muted sm mt-s" style="text-align:center;line-height:1.7">${c.misi}</p>
+  <div class="note mt">Modul dihitung selesai setelah Anda menyelesaikan kuis. Misi praktik ini membantu Anda langsung menerapkannya pada usaha.</div>
+  <button class="btn block mt-l" onclick="finishCourse()">Selesaikan modul</button>`);}
+function finishCourse(){const c=curCourse;
+ if(!db.done.includes(c.id)){db.done.push(c.id);addCoin(c.coin,'Modul selesai: '+c.t);}
+ save();checkMisi();render();
+ dlg(`<div class="pop" style="background:#FFEDD5">🌱</div>
+  <h3 style="text-align:center;font-size:20px">Modul selesai</h3>
+  <p class="muted sm" style="text-align:center;margin-top:4px">${c.t}</p>
+  <div class="card mt" style="background:var(--surface-2);text-align:center">
+   <div class="fd" style="font-weight:800;font-size:28px;color:var(--orange)">+${c.coin} 🌱</div>
+   <div class="tiny muted">Koin Tumbuh masuk ke saldo Anda</div>
+   <div class="kv mt"><span class="muted">Total koin</span><span class="b">${db.coin} 🌱</span></div>
+   <div class="kv"><span class="muted">SkorTumbuh</span><span class="b">${skor()}</span></div></div>
+  <div class="row mt-l" style="gap:10px">
+   <button class="btn ghost" onclick="closeDlg();show('reward')">Tukar koin</button>
+   <button class="btn" style="flex:1" onclick="closeDlg();show('learn')">Modul berikutnya</button></div>`);}
+
+/* ================= REWARD ================= */
+function redeem(id){const r=REWARDS.find(x=>x.id===id);
+ if(db.owned.includes(id))return toast('Reward ini sudah Anda miliki');
+ if(db.coin<r.c)return toast('Koin belum cukup, kurang '+(r.c-db.coin)+' koin');
+ dlg(`<h3 style="text-align:center;font-size:19px">Tukar reward?</h3>
+  <p class="muted sm" style="text-align:center;margin-top:4px">${r.n}</p>
+  <div class="card mt" style="background:var(--surface-2)">
+   <div class="kv"><span class="muted">Harga</span><span class="b">${r.c} 🌱</span></div>
+   <div class="kv"><span class="muted">Koin Anda</span><span class="b">${db.coin} 🌱</span></div>
+   <div class="kv"><span class="muted">Sisa</span><span class="b">${db.coin-r.c} 🌱</span></div></div>
+  <div class="row mt-l" style="gap:10px"><button class="btn ghost" onclick="closeDlg()">Batal</button>
+   <button class="btn orange" style="flex:1" onclick="doRedeem('${id}')">Tukar sekarang</button></div>`);}
+function doRedeem(id){const r=REWARDS.find(x=>x.id===id);db.owned.push(id);addCoin(-r.c,'Tukar: '+r.n);save();render();
+ dlg(`<div class="pop" style="background:var(--green-l)">${r.e}</div>
+  <h3 style="text-align:center;font-size:19px">Berhasil ditukar</h3>
+  <p class="muted sm" style="text-align:center;margin-top:4px">${r.n} sudah aktif di akun Anda</p>
+  <div class="note mt">Tunjukkan halaman ini di Mitra Tumbuh terdekat untuk menggunakannya.</div>
+  <button class="btn block mt-l" onclick="closeDlg()">Selesai</button>`);}
+
+/* ================= KYC & LOAN ================= */
+function doKyc(){if(db.kyc>=3)return toast('Semua tahap verifikasi sudah selesai');
+ const nx=KYC[db.kyc];
+ dlg(`<div class="row sp"><h3 style="font-size:19px">${nx.t}</h3><button class="icobtn" onclick="closeDlg()">✕</button></div>
+  <p class="muted sm mt-s">${nx.d}</p>
+  <div class="card mt" style="background:var(--surface-2)"><div class="sm" style="line-height:2.1">
+   ${db.kyc===1?'📷 Unggah foto KTP<br>🏠 Konfirmasi alamat usaha':'🏪 Unggah foto tempat usaha<br>🤝 Kunjungan verifikasi Mitra Tumbuh'}</div></div>
+  <div class="note mt">Data verifikasi hanya digunakan untuk menilai kelayakan dan tidak dibagikan tanpa persetujuan Anda.</div>
+  <div class="row mt-l" style="gap:10px"><button class="btn ghost" onclick="closeDlg()">Nanti saja</button>
+   <button class="btn" style="flex:1" onclick="finishKyc()">Kirim dokumen</button></div>`);}
+function finishKyc(){db.kyc++;save();render();
+ dlg(`<div class="pop" style="background:var(--green-l)">🪪</div>
+  <h3 style="text-align:center;font-size:19px">Verifikasi berhasil</h3>
+  <p class="muted sm" style="text-align:center;margin-top:4px">Anda kini pada Level ${db.kyc}</p>
+  <div class="card mt" style="background:var(--surface-2)">
+   <div class="kv"><span class="muted">Limit transaksi</span><span class="b">${rp(KYC[db.kyc-1].lim)}/bulan</span></div>
+   <div class="kv"><span class="muted">SkorTumbuh</span><span class="b">${skor()}</span></div></div>
+  <button class="btn block mt-l" onclick="closeDlg();show('modal')">Cek limit Modal Stok</button>`);}
+function applyLoan(){const v=+document.getElementById('lRange').value;
+ dlg(`<h3 style="text-align:center;font-size:19px">Konfirmasi pengajuan</h3>
+  <p class="muted sm" style="text-align:center;margin-top:4px">Dana dibayarkan kepada distributor mitra</p>
+  <div class="card mt" style="background:var(--surface-2)">
+   <div class="kv"><span class="muted">Jumlah</span><span class="b">${rp(v)}</span></div>
+   <div class="kv"><span class="muted">Tenor</span><span class="b">30 hari</span></div>
+   <div class="kv"><span class="muted">Biaya layanan</span><span class="b">${rp(v*0.018)}</span></div>
+   <div class="kv"><span class="muted">Total dibayar</span><span class="b">${rp(v*1.018)}</span></div></div>
+  <div class="note mt">Dengan melanjutkan, Anda menyetujui pembayaran melalui Mitra Tumbuh atau potongan transaksi digital.</div>
+  <div class="row mt-l" style="gap:10px"><button class="btn ghost" onclick="closeDlg()">Periksa lagi</button>
+   <button class="btn orange" style="flex:1" onclick="submitLoan(${v})">Ajukan sekarang</button></div>`);}
+function submitLoan(v){db.loan={v,st:'review',tgl:today()};save();render();
+ dlg(`<div class="pop" style="background:#FFEDD5">📦</div>
+  <h3 style="text-align:center;font-size:19px">Pengajuan terkirim</h3>
+  <p class="muted sm" style="text-align:center;margin-top:4px">Ditinjau paling lama 1×24 jam</p>
+  <div class="note mt">Anda akan diberi tahu melalui aplikasi dan Mitra Tumbuh terdekat. Catatan transaksi tetap berjalan seperti biasa.</div>
+  <button class="btn block mt-l" onclick="closeDlg();show('home')">Kembali ke beranda</button>`);
+ setTimeout(()=>{if(db.loan&&db.loan.st==='review'){db.loan.st='approved';save();render();toast('Pengajuan Modal Stok disetujui. Stok siap diambil di distributor.');}},7000);}
+function payLoan(){const t=Math.round(db.loan.v*1.018);
+ db.tx.unshift({id:'t'+Date.now(),a:t,desc:'Pelunasan Modal Stok',kat:'Belanja Stok',d:today(),t:'out'});
+ db.loan=null;save();render();toast('Modal Stok dilunasi dan tercatat sebagai pengeluaran');}
+
+/* ================= DATA TOOLS ================= */
+function download(name,content,type){const b=new Blob([content],{type});const u=URL.createObjectURL(b);
+ const a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500);}
+function exportCSV(){if(!db.tx.length)return toast('Belum ada transaksi untuk diunduh');
+ const rows=[['Tanggal','Jenis','Keterangan','Kategori','Jumlah']].concat(
+  db.tx.map(t=>[t.d,t.t==='in'?'Pemasukan':'Pengeluaran',t.desc.replace(/"/g,"'"),t.kat,t.a]));
+ download('transaksi-fingrow-'+today()+'.csv','\uFEFF'+rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv;charset=utf-8');
+ toast('File CSV diunduh');}
+function backupJSON(){download('cadangan-fingrow-'+today()+'.json',JSON.stringify(db,null,2),'application/json');toast('Cadangan data diunduh');}
+function restoreJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.profile||!Array.isArray(d.tx))throw 0;
+  db=Object.assign(JSON.parse(JSON.stringify(DEF)),d);save();applyTheme();render();toast('Cadangan berhasil dipulihkan');}
+  catch(e){toast('Berkas cadangan tidak dikenali');}};r.readAsText(f);inp.value='';}
+function confirmReset(){dlg(`<div class="pop" style="background:var(--red-l)">⚠️</div>
+ <h3 style="text-align:center;font-size:19px">Hapus semua data?</h3>
+ <p class="muted sm" style="text-align:center;margin-top:4px;line-height:1.7">Seluruh transaksi, koin, dan verifikasi akan hilang permanen. Sebaiknya unduh cadangan terlebih dahulu.</p>
+ <button class="btn ghost block mt" onclick="backupJSON()">💾 Unduh cadangan dulu</button>
+ <div class="row mt" style="gap:10px"><button class="btn ghost" onclick="closeDlg()">Batal</button>
+  <button class="btn danger" style="flex:1" onclick="hardReset()">Ya, hapus semua</button></div>`);}
+function hardReset(){db=JSON.parse(JSON.stringify(DEF));save();closeDlg();applyTheme();
+ document.getElementById('welcome').classList.add('on');wgo(0);}
+function editProfile(){dlg(`<div class="row sp"><h3 style="font-size:19px">Ubah data usaha</h3><button class="icobtn" onclick="closeDlg()">✕</button></div>
+ <label>Nama Anda</label><input id="eNama" value="${esc(db.profile.nama)}">
+ <label>Nama usaha</label><input id="eUsaha" value="${esc(db.profile.usaha)}">
+ <label>Jenis usaha</label><select id="eKat">${['Kuliner','Kelontong / Sembako','Pakaian','Jasa','Pertanian','Lainnya'].map(k=>`<option ${k===db.profile.kategori?'selected':''}>${k}</option>`).join('')}</select>
+ <label>Saldo awal (Rp)</label><input id="eSaldo" inputmode="numeric" value="${db.profile.saldoAwal.toLocaleString('id-ID')}">
+ <div class="note mt">Saldo awal adalah uang yang Anda pegang saat pertama memakai aplikasi ini.</div>
+ <button class="btn block mt-l" onclick="saveProfile()">Simpan perubahan</button>`);}
+function saveProfile(){db.profile.nama=document.getElementById('eNama').value.trim()||db.profile.nama;
+ db.profile.usaha=document.getElementById('eUsaha').value.trim()||db.profile.usaha;
+ db.profile.kategori=document.getElementById('eKat').value;
+ db.profile.saldoAwal=parseNum(document.getElementById('eSaldo').value);
+ save();closeDlg();render();toast('Data usaha diperbarui');}
+
+
+/* ================= NIB ================= */
+const CHK=[
+ {t:'NIK KTP elektronik yang masih berlaku',d:'Untuk usaha perseorangan, NIK menjadi identitas utama pendaftaran.'},
+ {t:'Email dan nomor HP aktif',d:'Dipakai untuk verifikasi akun OSS dan menerima dokumen NIB.'},
+ {t:'Alamat lengkap tempat usaha',d:'Termasuk RT, RW, kelurahan, dan kecamatan sesuai keadaan sebenarnya.'},
+ {t:'Bidang usaha atau kode KBLI',d:'Pilih yang paling sesuai dengan kegiatan usaha Anda sehari-hari.'},
+ {t:'Perkiraan modal usaha',d:'Nilai sarana usaha di luar tanah dan bangunan tempat usaha.'},
+ {t:'NPWP bila sudah memiliki',d:'Tidak wajib bagi sebagian pelaku usaha mikro, tetapi memudahkan proses.'},
+ {t:'Akta pendirian untuk badan usaha',d:'Hanya diperlukan bila usaha Anda berbentuk CV, PT, atau koperasi.'}];
+const OSS=[
+ {t:'Buat akun di oss.go.id',d:'Pilih skala usaha UMK perseorangan, lalu verifikasi lewat email atau nomor HP.'},
+ {t:'Masuk dan pilih Perizinan Berusaha',d:'Pilih menu permohonan baru sesuai jenis pelaku usaha Anda.'},
+ {t:'Isi data usaha',d:'Masukkan alamat usaha, bidang usaha (KBLI), dan perkiraan modal.'},
+ {t:'Periksa kembali seluruh data',d:'Pastikan alamat dan KBLI benar, karena memengaruhi perizinan lanjutan.'},
+ {t:'Setujui pernyataan mandiri',d:'Centang pernyataan kesesuaian kegiatan usaha dengan ketentuan yang berlaku.'},
+ {t:'NIB terbit dan dapat diunduh',d:'Simpan berkasnya, lalu catat nomornya di halaman ini agar mudah dicari.'}];
+const NFAQ=[
+ {q:'Berapa biaya mengurus NIB?',a:'Tidak ada biaya. Penerbitan NIB melalui OSS gratis. Bila ada pihak yang meminta bayaran atas nama pemerintah, sebaiknya Anda urus sendiri lewat oss.go.id atau minta pendampingan di DPMPTSP.'},
+ {q:'Usaha saya kecil dan di rumah, apa tetap perlu NIB?',a:'Perlu, dan justru mudah. Usaha mikro perseorangan seperti warung, katering rumahan, atau penjahit dapat mendaftar sebagai UMK perseorangan dengan modal NIK KTP saja.'},
+ {q:'Saya bingung memilih KBLI, bagaimana?',a:'Pilih kegiatan yang paling mendekati sumber penghasilan utama Anda. Bila masih ragu, datangi DPMPTSP atau Mal Pelayanan Publik, petugas akan membantu memilihkan.'},
+ {q:'Apakah NIB perlu diperpanjang?',a:'NIB berlaku selama usaha berjalan. Yang perlu diperbarui adalah data bila terjadi perubahan, misalnya pindah alamat usaha atau menambah bidang usaha.'},
+ {q:'Apa hubungan NIB dengan pembiayaan Modal Stok?',a:'NIB bukan syarat wajib di aplikasi ini, tetapi legalitas usaha memperkecil risiko bagi pemberi dana. Karena itu menyimpan NIB menambah SkorTumbuh dan menaikkan limit Anda.'}];
+function toggleChk(i){const k=String(i);db.chk=db.chk||[];
+ db.chk.includes(k)?db.chk=db.chk.filter(x=>x!==k):db.chk.push(k);save();renderNib();}
+function nibFaq(el){el.parentNode.classList.toggle('open');}
+function saveNib(){const n=(document.getElementById('nibInput').value||'').replace(/\D/g,'');
+ if(n.length<8)return toast('Nomor NIB terlihat belum lengkap, periksa kembali');
+ const baru=!db.nib.nomor;
+ db.nib={nomor:n,tgl:document.getElementById('nibDate').value||today()};save();render();
+ if(baru)dlg(`<div class="pop" style="background:var(--green-l)">🎉</div>
+  <h3 style="text-align:center;font-size:19px">NIB tersimpan</h3>
+  <p class="muted sm" style="text-align:center;margin-top:4px">Usaha Anda kini tercatat resmi di aplikasi</p>
+  <div class="card mt" style="background:var(--surface-2)">
+   <div class="kv"><span class="muted">Nomor NIB</span><span class="b">${n}</span></div>
+   <div class="kv"><span class="muted">SkorTumbuh</span><span class="b">${skor()} (+30)</span></div>
+   <div class="kv"><span class="muted">Limit Modal Stok</span><span class="b">${limitStok()?rp(limitStok()):'Belum terbuka'}</span></div></div>
+  <button class="btn block mt-l" onclick="closeDlg()">Selesai</button>`);
+ else toast('Data NIB diperbarui');}
+function hapusNib(){db.nib={nomor:'',tgl:''};save();render();toast('Data NIB dihapus dari perangkat ini');}
+function salinNib(){const t=db.nib.nomor;
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast('Nomor NIB disalin'),()=>toast('Nomor NIB: '+t));}
+ else toast('Nomor NIB: '+t);}
+function renderNib(){
+ const st=document.getElementById('nibStatus');
+ if(db.nib&&db.nib.nomor){
+  st.innerHTML=`<div class="card" style="background:linear-gradient(135deg,#047857,var(--green));color:#fff;border:0">
+   <div class="row sp wrap2"><div>
+     <span class="pill" style="background:rgba(255,255,255,.2);color:#fff">✅ Usaha terdaftar resmi</span>
+     <div class="fd" style="font-weight:800;font-size:30px;margin-top:10px;letter-spacing:1px">${esc(db.nib.nomor)}</div>
+     <div class="tiny" style="opacity:.9">Nomor Induk Berusaha · terbit ${tglLabel(db.nib.tgl)}</div></div>
+    <div class="row wrap2" style="gap:8px">
+     <button class="btn ghost sm" onclick="salinNib()">Salin nomor</button>
+     <a class="btn ghost sm ext" href="https://oss.go.id/" target="_blank" rel="noopener">Buka OSS ↗</a>
+     <button class="btn ghost sm" onclick="hapusNib()">Hapus</button></div></div></div>`;
+ }else{
+  st.innerHTML=`<div class="card" style="background:linear-gradient(135deg,var(--a5),var(--a2) 60%,var(--a4));color:#fff;border:0">
+   <div class="row sp wrap2" style="gap:16px">
+    <div style="flex:1;min-width:240px">
+     <span class="pill" style="background:rgba(255,255,255,.2);color:#fff">Belum terdaftar</span>
+     <h3 class="mt-s" style="font-size:22px">Daftarkan usaha Anda, gratis dan resmi</h3>
+     <p class="sm" style="opacity:.9;line-height:1.75;margin-top:8px;max-width:520px">NIB diterbitkan pemerintah melalui sistem OSS. Untuk usaha mikro perseorangan, prosesnya cukup dengan NIK KTP dan bisa selesai dalam hitungan menit.</p>
+     <div class="row mt wrap2" style="gap:9px">
+      <a class="btn ext" style="background:#fff;color:var(--a5)" href="https://oss.go.id/" target="_blank" rel="noopener">Daftar di oss.go.id ↗</a>
+      <button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.45)" onclick="document.getElementById('chkList').scrollIntoView({behavior:'smooth',block:'center'})">Lihat persiapannya</button></div>
+    </div>
+    <div style="font-size:66px;opacity:.9">🪪</div></div></div>`;}
+ const done=(db.chk||[]).length;
+ document.getElementById('chkCount').textContent=done+'/'+CHK.length;
+ document.getElementById('chkList').innerHTML=CHK.map((c,i)=>{const on=(db.chk||[]).includes(String(i));
+  return `<div class="chk ${on?'on':''}" onclick="toggleChk(${i})"><div class="bx">${on?'✓':''}</div>
+   <div><div class="sm b t">${c.t}</div><div class="tiny muted">${c.d}</div></div></div>`;}).join('');
+ document.getElementById('ossSteps').innerHTML=OSS.map((o,i)=>`<div class="step"><div class="n">${i+1}</div>
+  <div><div class="b sm">${o.t}</div><div class="tiny muted">${o.d}</div></div></div>`).join('');
+ document.getElementById('nibFaq').innerHTML=NFAQ.map(f=>`<div class="faq"><button onclick="nibFaq(this)">${f.q}<i>+</i></button><div class="a"><p>${f.a}</p></div></div>`).join('');
+ const ni=document.getElementById('nibInput');if(ni&&db.nib){ni.value=db.nib.nomor||'';document.getElementById('nibDate').value=db.nib.tgl||'';}
+ const b=document.getElementById('bdgNib');
+ b.textContent=(db.nib&&db.nib.nomor)?'':'!';b.style.display=(db.nib&&db.nib.nomor)?'none':'inline-block';}
+
+/* ================= RENDER ================= */
+function render(){
+ const q=id=>document.getElementById(id);
+ const s=skor(),lv=levelOf(db.coin),nx=nextLevel(db.coin);
+ const EMO={'Kuliner':'🍲','Kelontong / Sembako':'🏪','Pakaian':'👕','Jasa':'🛠️','Pertanian':'🌾','Lainnya':'🏬'};
+ const emo=EMO[db.profile.kategori]||'🏪';
+ q('sideAva').textContent=emo;q('pAva').textContent=emo;
+ q('sideUsaha').textContent=db.profile.usaha||'Usaha Saya';
+ q('sideLvl').textContent=lv.n;
+ const jam=new Date().getHours();
+ q('greet').textContent=(jam<11?'Selamat pagi, ':jam<15?'Selamat siang, ':jam<18?'Selamat sore, ':'Selamat malam, ')+(db.profile.nama||'Sahabat');
+ q('hSaldo').textContent=rp(saldo());
+ q('hSaldoSub').textContent='Termasuk saldo awal '+rp(db.profile.saldoAwal);
+ const ti=sumBy(t=>t.d===today()&&t.t==='in'),to=sumBy(t=>t.d===today()&&t.t==='out');
+ q('hIn').textContent=rp(ti);q('hOut').textContent=rp(to);q('hProfit').textContent=rp(ti-to);
+ q('hCoin').textContent=db.coin;q('lCoin').textContent=db.coin;q('rwCoin').textContent=db.coin;q('pCoin').textContent=db.coin;
+ q('hSkor').textContent=s;q('sVal').textContent=s;q('pSkor').textContent=s;
+ q('hSkorLvl').textContent=skorLvl().split(' · ')[0];q('sLvl').textContent=skorLvl();
+ q('hSkorBar').style.width=((s-300)/600*100)+'%';
+ q('arc').style.strokeDashoffset=490-(490*((s-300)/600)*.75);
+ const need=[];if(activeDays(30)<20)need.push('tambah hari mencatat');if(db.kyc<3)need.push('lengkapi verifikasi');if(db.done.length<COURSES.length)need.push('selesaikan modul Academy');
+ q('hSkorHint').textContent=need.length?('Untuk naik: '+need.slice(0,2).join(' dan ')):'Skor Anda sudah sangat baik.';
+ q('pTx').textContent=db.tx.length;q('pUsaha').textContent=db.profile.usaha||'Usaha Saya';
+ q('pMeta').textContent=db.profile.kategori+(db.profile.dibuat?' · sejak '+tglLabel(db.profile.dibuat):'');
+ q('pLvl').textContent=lv.n;q('pKyc').textContent='Verifikasi Level '+db.kyc;
+ // streak & daily
+ const n=txToday().length;
+ q('dailyLbl').textContent=Math.min(n,3)+' dari 3 transaksi';
+ q('dailyBar').style.width=Math.min(100,n/3*100)+'%';
+ q('streakPill').textContent='🔥 '+streak()+' hari beruntun';
+ q('dailyHint').textContent=n>=3?'Target hari ini tercapai. Konsistensi Anda terjaga.':'Catat '+(3-n)+' transaksi lagi untuk memenuhi target hari ini.';
+ // chart
+ chart(q('chart7'),last7());
+ const w=last7().reduce((a,d)=>({i:a.i+d.in,o:a.o+d.out}),{i:0,o:0});
+ q('weekSum').textContent='Masuk '+rp(w.i)+' · keluar '+rp(w.o);
+ // home tx
+ q('homeTx').innerHTML=db.tx.length?db.tx.slice(0,5).map(t=>txRow(t,true)).join('')
+  :`<div class="empty"><div class="e">🌱</div><div class="b">Catatan Anda masih kosong</div><p class="sm muted">Mulai dari transaksi terkecil hari ini.</p><button class="btn mt" onclick="openTx()">+ Catat Transaksi</button></div>`;
+ // misi
+ const misiHTML=MISI.map(m=>{const p=m.p(),ok=p>=m.max;
+  return `<div class="row" style="gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)">
+   <div style="width:24px;height:24px;border-radius:8px;border:2px solid ${ok?'var(--green)':'var(--line)'};background:${ok?'var(--green)':'transparent'};color:#fff;display:grid;place-items:center;font-size:12px;flex:0 0 24px">${ok?'✓':''}</div>
+   <div style="flex:1"><div class="sm b">${m.e} ${m.t}</div><div class="bar mt-s" style="height:6px"><i style="width:${p/m.max*100}%"></i></div></div>
+   <span class="pill ${ok?'green':'orange'}">+${m.c}</span></div>`;}).join('');
+ q('homeMisi').innerHTML=misiHTML;q('misiList').innerHTML=misiHTML;
+ const misiOpen=MISI.filter(m=>m.p()<m.max).length;
+ q('bdgReward').textContent=misiOpen||'';q('bdgReward').style.display=misiOpen?'inline-block':'none';
+ const modOpen=COURSES.length-db.done.length;
+ q('bdgLearn').textContent=modOpen||'';q('bdgLearn').style.display=modOpen?'inline-block':'none';
+ // learn
+ q('lDone').textContent=db.done.length;q('lTotal').textContent=COURSES.length;
+ q('lBar').style.width=(db.done.length/COURSES.length*100)+'%';
+ const modCard=c=>{const ok=db.done.includes(c.id);
+  return `<div class="mod" onclick="openCourse('${c.id}')"><div class="thumb" style="${ok?'background:linear-gradient(135deg,#34D399,#10B981)':''}">${ok?'✓':c.e}</div>
+   <div style="flex:1;min-width:0"><div class="b sm">${c.t}</div><div class="tiny muted mt-s">${c.dur} · ${c.quiz.length} soal kuis</div>
+   <div class="row mt-s" style="gap:6px"><span class="pill ${ok?'green':'orange'}">${ok?'Selesai':'+'+c.coin+' 🌱'}</span><span class="pill grey">+15 skor</span></div></div></div>`;};
+ q('modVideo').innerHTML=COURSES.filter(c=>c.cat==='video').map(modCard).join('');
+ q('modLive').innerHTML=COURSES.filter(c=>c.cat==='live').map(modCard).join('');
+ const nc=COURSES.find(c=>!db.done.includes(c.id));
+ q('homeLearn').innerHTML=nc?modCard(nc):'<div class="card"><div class="b sm">Semua modul selesai 🎉</div><div class="tiny muted mt-s">Anda sudah menyelesaikan seluruh materi TUMBUH Academy.</div></div>';
+ // reward
+ q('rwLvl').textContent=lv.n;
+ q('rwBar').style.width=(nx?((db.coin-lv.min)/(nx.min-lv.min)*100):100)+'%';
+ q('rwHint').textContent=nx?((nx.min-db.coin)+' koin lagi menuju '+nx.n):'Level tertinggi tercapai';
+ q('rwList').innerHTML=REWARDS.map(r=>{const own=db.owned.includes(r.id),can=db.coin>=r.c;
+  return `<div class="rw ${own?'own':''}"><div class="ic" style="background:${own?'var(--green-l)':'var(--blue-l)'};width:46px;height:46px;font-size:20px">${r.e}</div>
+   <div style="flex:1;min-width:0"><div class="b sm">${r.n}</div><div class="tiny muted">${r.d}</div></div>
+   ${own?'<span class="pill green">Dimiliki</span>':`<button class="btn sm ${can?'orange':'soft'}" onclick="redeem('${r.id}')">${r.c} 🌱</button>`}</div>`;}).join('');
+ q('coinLog').innerHTML=db.log.length?db.log.map(l=>`<div class="row sp" style="padding:8px 0;border-bottom:1px dashed var(--line)">
+   <div><div class="sm b">${l.why}</div><div class="tiny muted">${l.w}</div></div>
+   <div class="b ${l.n>0?'in':'out'}">${l.n>0?'+':''}${l.n} 🌱</div></div>`).join('')
+  :'<div class="empty sm">Belum ada aktivitas koin.</div>';
+ // skor faktor
+ q('sFaktor').innerHTML=faktor().map(f=>`<div style="padding:10px 0">
+  <div class="row sp"><span class="sm b">${f.t}</span><span class="tiny muted">${f.d}</span></div>
+  <div class="bar mt-s"><i style="width:${f.v}%"></i></div></div>`).join('');
+ // kyc
+ q('kycSteps').innerHTML=KYC.map((k,i)=>{const st=i<db.kyc?'done':(i===db.kyc?'now':'');
+  return `<div class="step ${st}"><div class="n">${i<db.kyc?'✓':i+1}</div>
+   <div style="flex:1"><div class="b sm">${k.t}</div><div class="tiny muted">${k.d}</div>
+   <div class="tiny mt-s" style="${i<db.kyc?'color:var(--green);font-weight:700':'color:var(--muted)'}">${i<db.kyc?'Terverifikasi · limit '+rp(k.lim):(i===db.kyc?'Menunggu dilengkapi':'Belum tersedia')}</div></div></div>`;}).join('');
+ q('kycBtn').textContent=db.kyc>=3?'Semua tahap selesai':'Lanjutkan ke '+KYC[db.kyc].t;
+ q('kycBtn').disabled=db.kyc>=3;
+ q('pNib').innerHTML=(db.nib&&db.nib.nomor)
+  ?`<div class="row sp wrap2"><div class="row"><div class="ic" style="background:var(--green-l)">🪪</div>
+    <div style="margin-left:4px"><div class="b sm">NIB ${esc(db.nib.nomor)}</div><div class="tiny muted">Terbit ${tglLabel(db.nib.tgl)} · menambah 30 poin skor</div></div></div>
+    <button class="btn ghost sm" onclick="show('nib')">Kelola</button></div>`
+  :`<div class="row sp wrap2"><div class="row"><div class="ic" style="background:var(--blue-l)">🪪</div>
+    <div style="margin-left:4px"><div class="b sm">Usaha Anda belum punya NIB</div><div class="tiny muted">Gratis, diurus lewat portal resmi pemerintah</div></div></div>
+    <button class="btn sm" onclick="show('nib')">Cara mengurus</button></div>`;
+ q('mitraList').innerHTML=MITRA.map(m=>`<div class="card"><div class="row"><div class="ic" style="background:var(--blue-l)">${m.e}</div>
+  <div style="margin-left:4px"><div class="b sm">${m.n}</div><div class="tiny muted">${m.j}</div></div></div>
+  <span class="pill green mt-s">Tersertifikasi</span></div>`).join('');
+ // modal stok
+ const sy=syarat(),lim=limitStok();
+ q('mSyarat').innerHTML=sy.map(x=>`<div class="row" style="gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)">
+  <div style="width:24px;height:24px;border-radius:8px;border:2px solid ${x.ok?'var(--green)':'var(--line)'};background:${x.ok?'var(--green)':'transparent'};color:#fff;display:grid;place-items:center;font-size:12px;flex:0 0 24px">${x.ok?'✓':''}</div>
+  <div style="flex:1"><div class="sm b">${x.t}</div><div class="tiny muted">${x.now}</div></div></div>`).join('');
+ q('mLimit').textContent=lim?rp(lim):'Rp0';
+ q('mStatus').textContent=lim?'Terbuka':'Terkunci';
+ q('mNib').innerHTML=(db.nib&&db.nib.nomor)?'🪪 Bonus legalitas aktif: limit Anda naik 20% karena usaha sudah ber-NIB.'
+  :'🪪 Punya NIB? Limit Anda bisa naik 20%. <u style="cursor:pointer" onclick="show(\'nib\')">Lihat caranya</u>';
+ q('hModalSub').textContent=lim?'Limit '+rpS(lim)+' terbuka':'Cek kelayakan';
+ const area=q('mArea');
+ if(db.loan){const ap=db.loan.st==='approved',t=Math.round(db.loan.v*1.018);
+  area.innerHTML=`<div class="card"><div class="row sp wrap2"><div class="row"><div class="ic" style="background:#FFEDD5">📦</div>
+    <div style="margin-left:4px"><div class="b">Pengajuan ${rp(db.loan.v)}</div><div class="tiny muted">Diajukan ${tglLabel(db.loan.tgl)}</div></div></div>
+    <span class="pill ${ap?'green':'orange'}">${ap?'Disetujui':'Sedang ditinjau'}</span></div>
+   ${ap?`<div class="mt"><div class="kv"><span class="muted">Total yang harus dibayar</span><span class="b">${rp(t)}</span></div>
+    <div class="kv"><span class="muted">Jatuh tempo</span><span class="b">30 hari sejak persetujuan</span></div>
+    <div class="kv"><span class="muted">Setara per hari</span><span class="b">${rp(t/30)}</span></div></div>
+    <div class="note ok mt">Stok sudah dapat diambil di distributor mitra Anda.</div>
+    <button class="btn block mt" onclick="payLoan()">Catat pelunasan</button>`
+   :`<div class="note mt">Pengajuan Anda sedang ditinjau. Hasilnya akan muncul di halaman ini.</div>`}</div>`;}
+ else if(lim){area.innerHTML=`<div class="card"><div class="b">Ajukan pembiayaan</div>
+   <div class="row sp mt"><span class="sm muted">Jumlah pengajuan</span><span class="fd b" style="font-size:20px;color:var(--orange)" id="lAmt">${rp(Math.min(1000000,lim))}</span></div>
+   <input type="range" class="slider mt" id="lRange" min="500000" max="${lim}" step="250000" value="${Math.min(1000000,lim)}" oninput="updLoan()" style="width:100%">
+   <div class="row sp tiny muted"><span>${rpS(500000)}</span><span>${rpS(lim)}</span></div>
+   <div class="mt"><div class="kv"><span class="muted">Tenor</span><span class="b">30 hari</span></div>
+    <div class="kv"><span class="muted">Biaya layanan 1,8%</span><span class="b" id="lFee"></span></div>
+    <div class="kv"><span class="muted">Total dibayar</span><span class="b" id="lTot"></span></div>
+    <div class="kv"><span class="muted">Setara per hari</span><span class="b" id="lDay"></span></div></div>
+   <button class="btn orange block mt-l" onclick="applyLoan()">Ajukan Sekarang</button></div>`;updLoan();}
+ else{area.innerHTML=`<div class="card"><div class="empty"><div class="e">🔒</div><div class="b">Limit belum terbuka</div>
+   <p class="sm muted" style="max-width:420px;margin:6px auto 0;line-height:1.7">Teruskan mencatat setiap hari dan lengkapi verifikasi. Limit terbuka otomatis begitu seluruh syarat terpenuhi.</p>
+   <div class="row mt" style="gap:10px;justify-content:center"><button class="btn" onclick="openTx()">Catat transaksi</button>
+   <button class="btn ghost" onclick="show('profil')">Lengkapi verifikasi</button></div></div></div>`;}
+ renderNib();
+ if(page==='tx')renderTx();
+ if(page==='report')renderReport();
+ // loan box home
+ const lb=q('loanBox');
+ if(db.loan){lb.style.display='block';const ap=db.loan.st==='approved';
+  lb.innerHTML=`<div class="row sp wrap2"><div class="row"><div class="ic" style="background:#FFEDD5">📦</div>
+   <div style="margin-left:4px"><div class="b sm">Modal Stok ${rp(db.loan.v)}</div><div class="tiny muted">${ap?'Disetujui · stok siap diambil':'Sedang ditinjau'}</div></div></div>
+   <button class="btn ghost sm" onclick="show('modal')">Lihat detail</button></div>`;}
+ else lb.style.display='none';
+}
+
+function updLoan(){const v=+document.getElementById('lRange').value;
+ document.getElementById('lAmt').textContent=rp(v);
+ document.getElementById('lFee').textContent=rp(v*0.018);
+ document.getElementById('lTot').textContent=rp(v*1.018);
+ document.getElementById('lDay').textContent=rp(v*1.018/30);}
+
+/* ================= INIT ================= */
+addEventListener('keydown',e=>{
+ if(e.key==='Escape')closeDlg();
+ if((e.key==='n'||e.key==='N')&&!/input|textarea|select/i.test(document.activeElement.tagName)&&!document.getElementById('mask').classList.contains('on')){e.preventDefault();openTx();}});
+function fitTop(){document.getElementById('burger').style.display=innerWidth<=940?'grid':'none';}
+addEventListener('resize',fitTop);fitTop();
+applyTheme();dailyReset();
+if(!db.setup)document.getElementById('welcome').classList.add('on');
+render();
+</script>
+</body>
+</html>
